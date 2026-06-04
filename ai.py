@@ -1,15 +1,20 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ቁልፉን ከድብቁ ቦታ (Secrets) በራሱ ያነበዋል
-api_key = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=api_key)
+# API ቁልፍን ከSecrets ማግኘት
+try:
+    genai.configure(api_key=st.secrets["api"]["GEMINI_API_KEY"])
+except:
+    st.error("❌ API Key አልተገኘም። Secrets አረጋግጥ።")
+    st.stop()
 
-st.title("የአቤል AI ረዳት 🤖")
+# ሞዴሉን አዘጋጅ
+model = genai.GenerativeModel('gemini-1.5-flash')
 
-user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
-
-if user_input:
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(user_input)
-    st.write(response.text)
+def get_ai_response(user_input):
+    try:
+        response = model.generate_content(user_input)
+        return response.text
+    except Exception as e:
+        st.error(f"ስህተት: {str(e)}")
+        return "ይቅርታ፣ ችግር ተፈጥሯል። እባክህ ቆይተህ እንደገና ሞክር።"
