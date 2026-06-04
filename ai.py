@@ -1,8 +1,8 @@
 import streamlit as st
 from google import genai
 
-# Streamlit Secrets ውስጥ ያስገባነውን ቁልፍ እዚህ ያነበዋል
-api_key = st.secrets["GEMINI_API_KEY"]
+# አዲሱን ቁልፍህን በቀጥታ እዚህ አስገብተነዋል
+api_key = "AIzaSyAQ.Ab8RN6ILouaV-srQPtX0gsIORtxe11CjLdrck-1CoQ9mlqu0ug"
 client = genai.Client(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖")
@@ -15,4 +15,3 @@ if user_input:
         contents=user_input,
     )
     st.write(response.text)
-    
