@@ -1,12 +1,13 @@
 import streamlit as st
 from google import genai
 
-# አዲሱን ቁልፍህን በቀጥታ እዚህ አስገብተነዋል
+# ፍጹም ትክክለኛው ቁልፍህ እዚህ ተስተካክሏል
 api_key = "AIzaSyAQAb8RN6ILouaV-srQPtX0gsIORtxe11CjLdrck-1CoQ9mlqu0ug"
 client = genai.Client(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖")
 
+# ተጠቃሚው ምንም ነገር ሳይጽፍ ኮዱ ዝም ብሎ ሰርቨር እንዳይጠይቅ ይከላከላል
 user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
