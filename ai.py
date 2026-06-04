@@ -1,19 +1,18 @@
 import streamlit as st
 from google import genai
 
-st.title("የአቤል AI ረዳት 🤖")
-st.write("እንኳን ወደ አቤል AI በሰላም መጡ!")
+# Streamlit Secrets ውስጥ ያስገባነውን ቁልፍ እዚህ ያነበዋል
+api_key = st.secrets["GEMINI_API_KEY"]
+client = genai.Client(api_key=api_key)
 
-user_input = st.text_input("ማወቅ የሚፈልጉትን ነገር እዚህ ይጠይቁኝ:")
+st.title("የአቤል AI ረዳት 🤖")
+
+user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
-    try:
-        client = genai.Client()
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=user_input,
-        )
-        st.write("### የAI መልስ:")
-        st.write(response.text)
-    except Exception as e:
-        st.error("ችግር ተፈጥሯል፤ እባክህ ድጋሚ ሞክር።")
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=user_input,
+    )
+    st.write(response.text)
+    
