@@ -1,8 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
 
-# አዲሱ ንጹሕ ቁልፍህ ሙሉ በሙሉ እዚህ ተስተካክሏል
-api_key = "AIzaSyAQAb8RN6Lv7EusIu4JfJ8Fao-gByn94IVyIt6_ZO5m_RZm7WhxcA"
+# ቁልፉን ከድብቁ ቦታ (Secrets) በራሱ ያነበዋል
+api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖")
