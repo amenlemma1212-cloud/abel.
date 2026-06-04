@@ -1,8 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ፍጹም ትክክለኛው እና የመጀመሪያው ቁልፍህ ያለምንም ነጥብ እዚህ አለ
-api_key = "AIzaSyAQAb8RN6K-vPjqy-Kntwc8codftV1osR0gUJ0PAhtyTKSAGrDhrg"
+# አዲሱ ንጹሕ ቁልፍህ ሙሉ በሙሉ እዚህ ተስተካክሏል
+api_key = "AIzaSyAQAb8RN6Lv7EusIu4JfJ8Fao-gByn94IVyIt6_ZO5m_RZm7WhxcA"
 genai.configure(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖")
