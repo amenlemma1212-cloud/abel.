@@ -18,7 +18,7 @@ try:
     st.markdown(
         f"""
         <style>
-        .stApp {{
+        .stApp {{ 
             background-image: url("data:image/jpg;base64,{img_base64}");
             background-size: cover;
             background-position: center;
