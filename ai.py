@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-# ቁልፉን ከድብቁ ቦታ (Secrets) በራሱ ያነበዋል፣ ጎግል ሊያግደው አይችልም
+# ቁልፉን ከStreamlit Secrets በራሱ ያነበዋል
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
 
@@ -13,3 +13,4 @@ if user_input:
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(user_input)
     st.write(response.text)
+    
