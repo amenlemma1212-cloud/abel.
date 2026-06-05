@@ -7,29 +7,9 @@ genai.configure(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖")
 
-# 1. የቻት ታሪክ ማከማቻ (History) መፍጠር
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
-
-# 2. የድሮዎቹን መልእክቶች በሚያምር የቻት መልክ ማሳየት
-for role, text in st.session_state.chat_history:
-    with st.chat_message(role):
-        st.write(text)
-
-# 3. በገጹ በታችኛው ክፍል አዲስ መጻፊያ ሳጥን
-user_input = st.chat_input("እዚህ ጋር ይጻፉ...")
+user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
-    # የአንተን ጥያቄ ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
-    with st.chat_message("user"):
-        st.write(user_input)
-    st.session_state.chat_history.append(("user", user_input))
-    
-    # ለድሮው ላይብረሪ የሚሰራውን ትክክለኛውን ስም እዚህ ተክተናል
-    model = genai.GenerativeModel('gemini-1.0-pro')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(user_input)
-    
-    # የAI መልስን ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
-    with st.chat_message("assistant"):
-        st.write(response.text)
-    st.session_state.chat_history.append(("assistant", response.text)) 
+    st.write(response.text)
