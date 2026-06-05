@@ -10,7 +10,8 @@ st.title("የአቤል AI ረዳት 🤖")
 user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
-    # ለአሮጌው ላይብረሪ 'gemini-pro' በመጠቀም 404 ስህተቱን እንፈታዋለን
-    model = genai.GenerativeModel('gemini-pro')
+    # ወቅታዊውን እና ትክክለኛውን ሞዴል እዚህ ተክተናል
+    model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(user_input)
     st.write(response.text)
+    
