@@ -32,4 +32,4 @@ if user_input:
     # የAI መልስን ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
     with st.chat_message("assistant"):
         st.write(response.text)
-    st.session_state.chat_history.append(("assistant", response.text))
+    st.session_state.chat_history.append(("assistant", response.text)) 
