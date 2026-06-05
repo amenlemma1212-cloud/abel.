@@ -25,8 +25,8 @@ if user_input:
         st.write(user_input)
     st.session_state.chat_history.append(("user", user_input))
     
-    # ለድሮው ላይብረሪ የሚስማማውን ስም እዚህ ተክተናል
-    model = genai.GenerativeModel('gemini-pro')
+    # ለድሮው ላይብረሪ የሚሰራውን ትክክለኛውን ስም እዚህ ተክተናል
+    model = genai.GenerativeModel('gemini-1.0-pro')
     response = model.generate_content(user_input)
     
     # የAI መልስን ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
