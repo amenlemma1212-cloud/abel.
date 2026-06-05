@@ -16,21 +16,20 @@ for role, text in st.session_state.chat_history:
     with st.chat_message(role):
         st.write(text)
 
-# 3. በገጹ በታችኛው ክፍል አዲስ መጻፊያ ሳጥን (ልክ እንደ ቴሌግራም)
+# 3. በገጹ በታችኛው ክፍል አዲስ መጻፊያ ሳጥን
 user_input = st.chat_input("እዚህ ጋር ይጻፉ...")
 
 if user_input:
-    # የአንተን ጥያቄ በገጹ ላይ ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
+    # የአንተን ጥያቄ ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
     with st.chat_message("user"):
         st.write(user_input)
     st.session_state.chat_history.append(("user", user_input))
     
-    # የAI ረዳቱን መጥራት (ለአሮጌ ላይብረሪ በሚሆን ስም)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # ለድሮው ላይብረሪ የሚስማማውን ስም እዚህ ተክተናል
+    model = genai.GenerativeModel('gemini-pro')
     response = model.generate_content(user_input)
     
-    # የAI መልስን በገጹ ላይ ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
+    # የAI መልስን ማሳየት እና ታሪክ ውስጥ ማስቀመጥ
     with st.chat_message("assistant"):
         st.write(response.text)
     st.session_state.chat_history.append(("assistant", response.text))
-    
