@@ -34,4 +34,3 @@ if user_input:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(user_input)
     st.write(response.text)
- 
