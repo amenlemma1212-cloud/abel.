@@ -7,7 +7,7 @@ genai.configure(api_key=api_key)
 
 st.title("የአቤል AI ረዳት 🤖 ")
 
-user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?  ከእግዛቢሄር ጋር ")
+user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
     try:
