@@ -17,3 +17,4 @@ if user_input:
     except Exception:
         # ሲቆራረጥ ወይም ገደቡ ሲያልቅ ያንን አስቀያሚ Error አጥፍቶ ይህንን ያሳያል፡
         st.warning("⚠️ abel ai Daily limit is up! Please try again tomorrow.")
+        st.warning (" hi . i can help you tomorrow.")
