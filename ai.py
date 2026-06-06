@@ -10,6 +10,10 @@ st.title("የአቤል AI ረዳት 🤖")
 user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
 
 if user_input:
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    response = model.generate_content(user_input)
-    st.write(response.text) 
+    try:
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        response = model.generate_content(user_input)
+        st.write(response.text)
+    except Exception:
+        # ሲቆራረጥ ወይም ገደቡ ሲያልቅ ያንን አስቀያሚ Error አጥፍቶ ይህንን ያሳያል፡
+        st.warning("⚠️ Daily limit is up! Please try again tomorrow.")
