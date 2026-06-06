@@ -5,9 +5,9 @@ import google.generativeai as genai
 api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=api_key)
 
-st.title("የአቤል AI ረዳት 🤖")
+st.title("የአቤል AI ረዳት 🤖 ")
 
-user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
+user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?  ከእግዛቢሄር ጋር ")
 
 if user_input:
     try:
