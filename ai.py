@@ -16,4 +16,4 @@ if user_input:
         st.write(response.text)
     except Exception:
         # ሲቆራረጥ ወይም ገደቡ ሲያልቅ ያንን አስቀያሚ Error አጥፍቶ ይህንን ያሳያል፡
-        st.warning("⚠️ Daily limit is up! Please try again tomorrow.")
+        st.warning("⚠️ abel ai Daily limit is up! Please try again tomorrow.")
