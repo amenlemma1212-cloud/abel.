@@ -1,9 +1,13 @@
 import streamlit as st
+from g4f.client import Client
 
-# 1. Page Configuration
+# 1. AI Client Setup (ያለ API Key የሚሠራ እውነተኛ AI)
+client = Client()
+
+# 2. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS (Ethiopia Flag Theme)
+# 3. Advanced CSS (Ethiopia Flag Theme)
 st.markdown("""
     <style>
     .stApp {
@@ -37,7 +41,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (የአፕሊኬሽኑ ማህደረ ትውስታ)
+# 4. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -94,28 +98,4 @@ def chat_page():
             st.session_state.logged_in = False
             st.session_state.messages = [] 
             st.session_state.photo_count = 0
-            st.session_state.show_uploader = False
-            st.rerun()
-
-    # Sidebar
-    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
-    PHOTO_LIMIT = 3
-    remains_photo = PHOTO_LIMIT - st.session_state.photo_count
-    st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
-
-    # Display History
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    st.write("---")
-
-    # 📷 የፎቶ ቁልፍ
-    if st.button("📷 Add Photo (ፎቶ አያይዝ)", key="toggle_upload_btn"):
-        st.session_state.show_uploader = not st.session_state.show_uploader
-        st.rerun()
-
-    if st.session_state.show_uploader:
-        if st.session_state.photo_count >= 3:
-            st
-            
+            st.session_state.show_uploader
