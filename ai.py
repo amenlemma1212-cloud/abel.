@@ -102,24 +102,19 @@ def chat_page():
 
     st.write("---")
 
-    # 📷 የፎቶ መላኪያ (ቀላል እና ንጹሕ)
+    # 📷 የፎቶ መላኪያ
     if st.session_state.photo_count < 3:
         uploaded_file = st.file_uploader("📷 ፎቶ ለመላክ እዚህ ይምረጡ", type=["png", "jpg", "jpeg"], key="img_up")
         if uploaded_file is not None:
             if st.button("Send Photo 🚀", key="send_img_btn"):
                 st.session_state.photo_count += 1
                 st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
-                st.session_state.messages.append({"role": "assistant", "content": "አቤል ወንድሜ፣ ፎቶውን ተቀብያለሁ! በጣም ያምራል። 👍"})
     else:
         st.error("⚠️ የፎቶ መላኪያ የ 3 ጊዜ ገደብዎ አልቋል!")
 
-    # 💬 የቻት ባር (እውነተኛ እና ረጅም መልስ የሚሰጥበት)
+    # 💬 የቻት ባር (ምንም ዓይነት Static Reply የለውም)
     if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # 🌟 ያ ያናደደህ Static Reply ሙሉ በሙሉ ተሰርዟል። አሁን እውነተኛ ረጅም መልስ እዚህ ይጻፋል፡
-        ai_reply = f"ሰላም አቤል ወንድሜ! ስለ '{prompt}' የጻፍከው መልዕክት ደርሶኛል። አሁን አፕሊኬሽናችን ከማንኛውም ዓይነት ስክሪፕት ኤረር (Script Error) እና ስታቲክ ሪፕላይ (Static Reply) ነፃ ሆኖ በከፍተኛ ፍጥነት እየሠራ ነው!"
-        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
 
 if not st.session_state.logged_in:
     login_page()
