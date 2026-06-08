@@ -11,7 +11,7 @@ def play_welcome_sound():
     audio_html = f'<audio autoplay><source src="{tts_url}" type="audio/mpeg"></audio>'
     st.markdown(audio_html, unsafe_allow_html=True)
 
-# 3. Advanced CSS (Ethiopia Flag + Social Buttons Design)
+# 3. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar + Social Icons)
 st.markdown("""
     <style>
     @keyframes zoomIn {
@@ -32,12 +32,35 @@ st.markdown("""
         color: white;
     }
 
-    /* የመስታወት መልክ */
-    div[data-testid="stChatMessage"], div[data-testid="stChatInput"], .stTabs {
+    /* የመስታወት መልክ (Tabs and Messages) */
+    div[data-testid="stChatMessage"], .stTabs {
         border-radius: 25px !important;
         backdrop-filter: blur(15px);
         background: rgba(255, 255, 255, 0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 🌟 የቻት ባሩን ጥቁርነት አጥፍቶ ወደ ንጹሕ መስታወት (Premium Glass) መቀየር */
+    div[data-testid="stChatInput"] {
+        border-radius: 30px !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        background: rgba(255, 255, 255, 0.2) !important; /* የጠቆረው ክፍል ጠፍቶ ነጣ ያለ መስታወት ይሆናል */
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    div[data-testid="stChatInput"] textarea {
+        color: white !important;
+        background: transparent !important;
+    }
+
+    /* የGoogle እና Telegram ቁልፎች በራሳቸው አይኮን እንዲያምሩ ማድረጊያ ስታይል */
+    .social-icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -74,13 +97,15 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይግቡ ---")
-        if st.button("🔴 Continue with Google", key="google_login_unique"):
+        # 🔴 Google Login with Icon
+        if st.button("🌐 Continue with Google", key="google_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        if st.button("🔵 Continue with Telegram", key="tele_login_unique"):
+        # 🔵 Telegram Login with Icon
+        if st.button("💬 Continue with Telegram", key="tele_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
             st.session_state.play_sound = True
@@ -98,13 +123,15 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይመዝገቡ ---")
-        if st.button("🔴 Sign Up with Google", key="google_reg_unique"):
+        # 🔴 Google Signup with Icon
+        if st.button("🌐 Sign Up with Google", key="google_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        if st.button("🔵 Sign Up with Telegram", key="tele_reg_unique"):
+        # 🔵 Telegram Signup with Icon
+        if st.button("💬 Sign Up with Telegram", key="tele_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
             st.session_state.play_sound = True
@@ -153,7 +180,7 @@ def chat_page():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Chat Bar
+    # 🌟 Chat Bar (Premium Glass Mode)
     if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
         if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
             st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
@@ -163,15 +190,4 @@ def chat_page():
                 st.markdown(prompt)
             st.session_state.messages.append({"role": "user", "content": prompt})
 
-            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ! (ጥያቄ ቁጥር {st.session_state.message_count})"
-            with st.chat_message("assistant"):
-                st.markdown(ai_reply)
-            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# Logic to switch pages
-if not st.session_state.logged_in:
-    login_page()
-else:
-    chat_page()
+            ai
