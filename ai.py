@@ -1,20 +1,38 @@
 import streamlit as st
-import google.generativeai as genai
 
-# ቁልፉን ከStreamlit Secrets ያነበዋል
-api_key = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=api_key)
+# የአፑ ስም እና ምልክት
+st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-st.title("የአቤል AI ረዳት 🤖 ")
+st.title("Abel AI 🌟")
+st.write("እንኳን ወደ አቤል AI በደህና መጡ! አሁን ሁሉንም ነገር አስታውሳለሁ።")
+st.write("---")
 
-user_input = st.text_input("እንዴት ልረዳህ እችላለሁ?")
+# 1. የቻት ታሪክ (Chat History) ማስታወሻ መፍጠር (እንዳይረሳ)
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if user_input:
-    try:
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        response = model.generate_content(user_input)
-        st.write(response.text)
-    except Exception:
-        # ሲቆራረጥ ወይም ገደቡ ሲያልቅ ያንን አስቀያሚ Error አጥፍቶ ይህንን ያሳያል፡
-        st.warning("⚠️ Abel Ai Daily limit is up! Please try again tomorrow.")
+# 2. የድሮ የንግግር ታሪኮችን በስክሪኑ ላይ ማሳየት
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# 3. የቻት ባር (Chat Bar) ከነ ምልክቱ (Enter Icon)
+if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+    
+    # የተጠቃሚውን መልእክት ማሳየት
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    
+    # መልእክቱን ወደ ታሪክ (History) መጨመር
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # AIው የሚመልሰው ቀላል መልስ (ታሪክ እያስታወሰ)
+    all_words = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
+    ai_reply = f"አቤል ወንድሜ፣ የላክኸውን መልእክት ሰምቻለሁ፦ '{prompt}'። \n\nእስካሁን ያወራናቸው ነገሮች በሙሉ በታሪኬ ውስጥ ተቀምጠዋል፦ {' ➡️ '.join(all_words)}"
+
+    # የAIውን መልስ ማሳየት
+    with st.chat_message("assistant"):
+        st.markdown(ai_reply)
         
+    # የAIውን መልስ ወደ ታሪክ መጨመር
+    st.session_state.messages.append({"role": "assistant", "content": ai_reply})
