@@ -53,9 +53,7 @@ if "user_type" not in st.session_state:
     st.session_state.user_type = None 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "message_count" not in st.session_state:
-    st.session_state.message_count = 0
-# 📷 የፎቶ መቁጠሪያ ብቻ (Limit: 3)
+# 📷 የፎቶ መቁጠሪያ (Limit: 3)
 if "photo_count" not in st.session_state:
     st.session_state.photo_count = 0
 
@@ -103,44 +101,48 @@ def chat_page():
         if st.button("Exit", key="real_exit_btn"):
             st.session_state.logged_in = False
             st.session_state.messages = [] 
-            st.session_state.message_count = 0
             st.session_state.photo_count = 0
             st.rerun()
 
-    # Sidebar (መጠን ማሳያ)
+    # Sidebar (የፎቶ መጠን ማሳያ)
     st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
     PHOTO_LIMIT = 3
     remains_photo = PHOTO_LIMIT - st.session_state.photo_count
     st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
-    st.sidebar.write(f"🎤 ድምፅ፦ ገደብ የለውም! (No Limit)")
 
-    # 📷 🎤 የፎቶ እና ድምፅ መላኪያ
-    with st.expander("📷 ፎቶ ወይም 🎤 ድምፅ ለመላክ እዚህ ይጫኑ"):
-        col_img, col_aud = st.columns(2)
-        
-        with col_img:
-            # 🌟 የፎቶ ገደብ ቼክ
-            if st.session_state.photo_count >= 3:
-                st.error("⚠️ የፎቶ መላኪያ ገደብዎ (3) አልቋል!")
-            else:
-                uploaded_file = st.file_uploader("📷 Upload Image", type=["png", "jpg", "jpeg"], key="img_up")
-                if uploaded_file is not None:
-                    if st.button("Send Photo 🚀", key="send_img_btn"):
-                        st.session_state.photo_count += 1
-                        st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
-                        st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን አይቶታል። በጣም ያምራል! 👍"})
-                        st.rerun()
-
-        with col_aud:
-            # 🌟 ድምፅ ያለምንም ገደብ (No Limit)
-            audio_file = st.audio_input("🎤 Record Audio", key="audio_up")
-            if audio_file is not None:
-                if st.button("Send Voice 🚀", key="send_aud_btn"):
-                    st.session_state.messages.append({"role": "user", "content": "🎤 [የድምፅ መልዕክት ተልኳል]"})
-                    st.session_state.messages.append({"role": "assistant", "content": "አቤል AI የድምፅ መልዕክትህን ሰምቶታል። 👂"})
+    # 📷 የፎቶ መላኪያ ሳጥን
+    with st.expander("📷 ፎቶ ለመላክ እዚህ ይጫኑ"):
+        if st.session_state.photo_count >= 3:
+            st.error("⚠️ የፎቶ መላኪያ የ 3 ጊዜ ገደብዎ አልቋል!")
+        else:
+            uploaded_file = st.file_uploader("📷 Upload Image (ፎቶ ይምረጡ)", type=["png", "jpg", "jpeg"], key="img_up")
+            if uploaded_file is not None:
+                if st.button("Send Photo 🚀", key="send_img_btn"):
+                    st.session_state.photo_count += 1
+                    st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
+                    st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን አይቶታል። በጣም ያምራል! 👍"})
                     st.rerun()
 
     st.write("---")
 
     # Display History
-    for message in st
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Chat Bar (Text Input)
+    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        ai_reply = "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"
+        with st.chat_message("assistant"):
+            st.markdown(ai_reply)
+        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+        st.rerun()
+
+if not st.session_state.logged_in:
+    login_page()
+else:
+    chat_page()
