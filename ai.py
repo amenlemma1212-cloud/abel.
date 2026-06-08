@@ -150,7 +150,7 @@ def chat_page():
             with st.chat_message("assistant"):
                 st.markdown(ai_reply)
             st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-            st.rerun()
+            st.rerun() 
 
 if not st.session_state.logged_in:
     login_page()
