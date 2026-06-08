@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ እና የሎጊን ቁልፎች ዲዛይን)
 st.markdown("""
     <style>
     .stApp {
@@ -24,7 +24,6 @@ st.markdown("""
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
-    /* ማህበራዊ ቁልፎች */
     .btn-google { background-color: #df4a32 !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
     .btn-telegram { background-color: #0088cc !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
     </style>
@@ -38,7 +37,7 @@ if "user_type" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- LOGIN PAGE ---
+# --- LOGIN PAGE (ሎጊን) ---
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     tab1, tab2, tab3 = st.tabs(["Login / Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
@@ -70,34 +69,29 @@ def login_page():
             st.session_state.user_type = "Guest"
             st.rerun()
 
-# --- CHAT PAGE ---
+# --- CHAT PAGE (ቻት) ---
 def chat_page():
     st.title(f"Abel AI - {st.session_state.user_type}")
     
     if st.button("Logout 🚪"):
         st.session_state.logged_in = False
+        st.session_state.messages = []
         st.rerun()
 
-    # ቻቱን ማሳያ
+    # ያለፉ መልዕክቶችን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር
+    # 💬 የቻት ባር (የ AI መልስ ጽሑፍ ሙሉ በሙሉ ተሰርዟል!)
     if prompt := st.chat_input("እዚህ ይጻፉ..."):
+        # አንተ የጻፍከውን ብቻ ያስቀምጣል
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-            
-        # 🌟 እውነተኛ የ AI መልስ (ያለ ስታቲክ ሪፕላይ)
-        ai_reply = f"አቤል ወንድሜ፣ '{prompt}' ያልከኝ ነገር ደርሶኛል! አፑ አሁን በጥሩ ሁኔታ እየሰራ ነው። ምን ልርዳህ?"
-        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-        with st.chat_message("assistant"):
-            st.markdown(ai_reply)
 
-# ገጹን መምረጫ
+# ገጹን መቆጣጠሪያ
 if not st.session_state.logged_in:
     login_page()
 else:
     chat_page()
-    
