@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS (Ethiopia Flag Theme + Premium Glass UI)
+# 2. Premium Custom CSS (Clean UI Like Gemini/ChatGPT)
 st.markdown("""
     <style>
     /* የኢትዮጵያ ባንዲራ ጀርባ */
@@ -19,16 +19,6 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.2) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
-
-    /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Glass) መቀየር */
-    .chat-container {
-        border-radius: 25px !important;
-        backdrop-filter: blur(15px) !important;
-        background: rgba(255, 255, 255, 0.25) !important;
-        border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        padding: 10px;
-        margin-top: 20px;
-    }
     
     /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
     h1, h2, h3, p, label, span {
@@ -41,17 +31,38 @@ st.markdown("""
         text-align: center;
         margin-bottom: 10px;
     }
+
+    /* 🌟 የቻት ባሩን ልክ እንደ እኔ ውብ ማድረጊያ (Premium Chat Bar Box) */
+    .custom-chat-box {
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 30px;
+        padding: 5px 15px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* የስትሪምሊት ነባር ማስተካከያዎችን ማጥፊያ */
+    .stTextInput>div>div>input {
+        background: transparent !important;
+        color: white !important;
+        border: none !important;
+    }
+    .stFileUploader>div>button {
+        background: transparent !important;
+        color: white !important;
+        border: none !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (ማስታወሻዎች)
+# 3. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
     st.session_state.user_type = None 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-# 📷 የፎቶ መቁጠሪያ (Limit: 3)
 if "photo_count" not in st.session_state:
     st.session_state.photo_count = 0
 
@@ -115,41 +126,44 @@ def chat_page():
 
     st.write("---")
 
-    # 🌟 NEW CHAT BAR (ፎቶ ማያያዣ ቁልፍ እና የጽሑፍ ሳጥን በአንድ ላይ)
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    # 🌟 PREMIUM CHAT BAR CONTAINER (ልክ እንደ እኔ ዲዛይን የተስተካከለ)
+    st.markdown('<div class="custom-chat-box">', unsafe_allow_html=True)
     
-    # 3 ቦታዎችን ጎን ለጎን መፍጠር (ለፎቶ ቁልፍ፣ ለጽሑፍ፣ እና ለመላኪያ ቁልፍ)
-    col_photo, col_text, col_send = st.columns([2, 5, 1])
+    # የቻት ባሩን ክፍሎች በጣም ጥብቅና ውብ በሆነ አሰላለፍ ማስቀመጥ
+    c_photo, c_input, c_send = st.columns([1, 6, 1])
     
-    with col_photo:
+    with c_photo:
         if st.session_state.photo_count >= 3:
-            st.caption("📷 ❌ (ገደብ አልቋል)")
+            st.markdown("<h5 style='text-align:center;'>❌</h5>", unsafe_allow_html=True)
             uploaded_file = None
         else:
-            # የፎቶ አይኮን ቁልፍ (File Uploader በትንሹ)
-            uploaded_file = st.file_uploader("📷 Icon", type=["png", "jpg", "jpeg"], label_visibility="collapsed", key="chat_photo")
+            # በጣም ትንሽና ውብ የፎቶ ማያያዣ አይኮን
+            uploaded_file = st.file_uploader("📷", type=["png", "jpg", "jpeg"], label_visibility="collapsed", key="bar_photo")
 
-    with col_text:
+    with c_input:
         # የጽሑፍ መጻፊያ ሳጥን
-        user_message = st.text_input("እዚህ ይጻፉ... 💬", label_visibility="collapsed", key="chat_msg")
+        user_message = st.text_input("መልዕክትዎን እዚህ ይጻፉ...", label_visibility="collapsed", key="bar_msg")
 
-    with col_send:
-        # የመላኪያ ቁልፍ (Send Button)
-        send_clicked = st.button("🚀", key="send_all_btn")
+    with c_send:
+        # የመላኪያ ቁልፍ
+        send_pressed = st.button("🚀", key="bar_send_btn")
         
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # 🚀 ቁልፉ ሲጫን የሚሠራው ሥራ
-    if send_clicked:
+    # 🚀 መላኪያ ቁልፍ ሲጫን
+    if send_pressed:
         if user_message or uploaded_file:
-            # 1. ፎቶ ብቻ ወይም ፎቶ ከጽሑፍ ጋር ከተላከ
+            # ፎቶ እና ጽሑፍ አብረው ከተላኩ
             if uploaded_file is not None:
                 st.session_state.photo_count += 1
-                display_content = f"📷 [ፎቶ ተያይዟል]\n\n✍️ **መልዕክት:** {user_message}" if user_message else "📷 [ፎቶ ተልኳል]"
-                st.session_state.messages.append({"role": "user", "content": display_content})
-                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶዎን እና መልዕክትዎን ተቀብሏል። 👍"})
+                if user_message:
+                    final_text = f"📷 **[ፎቶ ተያይዟል]**\n\n✍️ {user_message}"
+                else:
+                    final_text = "📷 **[ፎቶ ተልኳል]**"
+                st.session_state.messages.append({"role": "user", "content": final_text})
+                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን እና መልዕክትዎን ተቀብሏል። 👍"})
             
-            # 2. ጽሑፍ ብቻ ከተላከ
+            # ጽሑፍ ብቻ ከተላከ
             elif user_message:
                 st.session_state.messages.append({"role": "user", "content": user_message})
                 st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"})
