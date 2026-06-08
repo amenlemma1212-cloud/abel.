@@ -37,7 +37,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State
+# 3. Session State (የአፕሊኬሽኑ ማህደረ ትውስታ)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -117,23 +117,5 @@ def chat_page():
 
     if st.session_state.show_uploader:
         if st.session_state.photo_count >= 3:
-            st.error("⚠️ የፎቶ መላኪያ የ 3 ጊዜ ገደብዎ አልቋል!")
-        else:
-            uploaded_file = st.file_uploader("ፎቶዎን ይምረጡ", type=["png", "jpg", "jpeg"], key="hidden_img_up")
-            if uploaded_file is not None:
-                if st.button("Send Selected Photo 🚀", key="submit_hidden_img"):
-                    st.session_state.photo_count += 1
-                    st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
-                    st.session_state.messages.append({"role": "assistant", "content": "አቤል ወንድሜ፣ የላክኸውን ፎቶ በደስታ ተቀብያለሁ! በጣም ደስ የሚል ፎቶ ነው። 👍"})
-                    st.session_state.show_uploader = False
-                    st.rerun()
-
-    # 💬 የቻት ባር (አሁን ረጅም ሙሉ አረፍተ ነገር ይመልሳል)
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # 🌟 የተስተካከለ ረጅም መልስ (Static Reply የተባለው አንድ ቃል ተሰርዟል)
-        ai_reply = f"አቤል ወንድሜ፣ ስለ ጽሑፍህ በጣም አመሰግናለሁ! '{prompt}' ያልከኝ ነገር
-        
+            st
+            
