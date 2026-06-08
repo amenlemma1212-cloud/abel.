@@ -3,55 +3,39 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar + Social Icons)
+# 2. Simplified CSS (Ethiopia Flag + Premium Glass Chat Bar)
 st.markdown("""
     <style>
-    @keyframes zoomIn {
-        0% { opacity: 0; transform: scale(0.9); }
-        100% { opacity: 1; transform: scale(1); }
-    }
-    @keyframes slideIn {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    
-    .main-container { animation: zoomIn 0.5s ease-out; }
-    .chat-container { animation: slideIn 0.4s ease-out; }
-
     /* የኢትዮጵያ ባንዲራ ጀርባ */
     .stApp {
-        background: linear-gradient(180deg, #009A44 0%, #FED100 50%, #EF4123 100%) !important;
-        background-attachment: fixed !important;
-        color: white !important;
+        background: linear-gradient(180deg, #009A44 0%, #FED100 50%, #EF4123 100%);
+        color: white;
     }
 
-    /* የመስታወት መልክ ለካርዶች */
+    /* የመስታወት መልክ ለካርዶች እና ለTabs */
     div[data-testid="stChatMessage"], .stTabs {
-        border-radius: 20px !important;
-        backdrop-filter: blur(15px) !important;
+        border-radius: 15px !important;
+        backdrop-filter: blur(10px) !important;
         background: rgba(255, 255, 255, 0.2) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Premium Glass) መቀየር */
+    /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Glass) መቀየር */
     div[data-testid="stChatInput"] {
-        border-radius: 30px !important;
-        backdrop-filter: blur(25px) !important;
-        -webkit-backdrop-filter: blur(25px) !important;
+        border-radius: 25px !important;
+        backdrop-filter: blur(15px) !important;
         background: rgba(255, 255, 255, 0.25) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
     }
     
     div[data-testid="stChatInput"] textarea {
         color: white !important;
-        background: transparent !important;
     }
     
-    /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
+    /* ጽሑፎች በደንብ እንዲታዩ ማድረጊያ */
     h1, h2, h3, p, label {
         color: white !important;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7) !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -68,7 +52,6 @@ if "message_count" not in st.session_state:
 
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
-    st.markdown('<div class="main-container">', unsafe_allow_html=True)
     st.title("Abel AI 🌟 🇪🇹")
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
@@ -122,13 +105,9 @@ def login_page():
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
             st.rerun()
-            
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # --- MAIN CHAT PAGE ---
 def chat_page():
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    
     # Header
     col1, col2 = st.columns([4, 1])
     with col1:
@@ -169,9 +148,9 @@ def chat_page():
                 st.markdown(ai_reply)
             st.session_state.messages.append({"role": "assistant", "content": ai_reply})
             st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Logic to switch pages
 if not st.session_state.logged_in:
     login_page()
-else
+else:
+    chat_page()
