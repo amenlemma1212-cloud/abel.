@@ -1,71 +1,62 @@
 import streamlit as st
-import time
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Welcome Sound Function
-def play_welcome_sound():
-    text = "Welcome to Abel AI"
-    tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q={text.replace(' ', '+')}"
-    audio_html = f'<audio autoplay><source src="{tts_url}" type="audio/mpeg"></audio>'
-    st.markdown(audio_html, unsafe_allow_html=True)
-
-# 3. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar + Social Icons)
+# 2. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar + Social Icons)
 st.markdown("""
     <style>
     @keyframes zoomIn {
-        0% { opacity: 0; transform: scale(0.8); }
+        0% { opacity: 0; transform: scale(0.9); }
         100% { opacity: 1; transform: scale(1); }
     }
     @keyframes slideIn {
-        0% { opacity: 0; transform: translateX(-50px); }
-        100% { opacity: 1; transform: translateX(0); }
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
     
-    .main-container { animation: zoomIn 0.8s ease-out; }
-    .chat-container { animation: slideIn 0.6s ease-out; }
+    .main-container { animation: zoomIn 0.5s ease-out; }
+    .chat-container { animation: slideIn 0.4s ease-out; }
 
     /* የኢትዮጵያ ባንዲራ ጀርባ */
     .stApp {
-        background: linear-gradient(180deg, #009A44 0%, #FED100 50%, #EF4123 100%);
-        color: white;
+        background: linear-gradient(180deg, #009A44 0%, #FED100 50%, #EF4123 100%) !important;
+        background-attachment: fixed !important;
+        color: white !important;
     }
 
-    /* የመስታወት መልክ (Tabs and Messages) */
+    /* የመስታወት መልክ ለካርዶች */
     div[data-testid="stChatMessage"], .stTabs {
-        border-radius: 25px !important;
-        backdrop-filter: blur(15px);
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px !important;
+        backdrop-filter: blur(15px) !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* 🌟 የቻት ባሩን ጥቁርነት አጥፍቶ ወደ ንጹሕ መስታወት (Premium Glass) መቀየር */
+    /* 🌟 የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Premium Glass) መቀየር */
     div[data-testid="stChatInput"] {
         border-radius: 30px !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        background: rgba(255, 255, 255, 0.2) !important; /* የጠቆረው ክፍል ጠፍቶ ነጣ ያለ መስታወት ይሆናል */
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
     }
     
     div[data-testid="stChatInput"] textarea {
         color: white !important;
         background: transparent !important;
     }
-
-    /* የGoogle እና Telegram ቁልፎች በራሳቸው አይኮን እንዲያምሩ ማድረጊያ ስታይል */
-    .social-icon-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
+    
+    /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
+    h1, h2, h3, p, label {
+        color: white !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. Session State (ማስታወሻዎች)
+# 3. Session State (ማስታወሻዎች)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -75,6 +66,12 @@ if "messages" not in st.session_state:
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
 if "play_sound" not in st.session_state:
+    st.session_state.play_sound = False
+
+# --- 🌟 WELCOME SOUND (HTML AUTOPLAY) ---
+if st.session_state.play_sound:
+    tts_url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=Welcome+to+Abel+AI"
+    st.markdown(f'<iframe src="{tts_url}" allow="autoplay" style="display:none;"></iframe>', unsafe_allow_html=True)
     st.session_state.play_sound = False
 
 # --- SIGN IN / SIGN UP PAGE ---
@@ -97,14 +94,12 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይግቡ ---")
-        # 🔴 Google Login with Icon
         if st.button("🌐 Continue with Google", key="google_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        # 🔵 Telegram Login with Icon
         if st.button("💬 Continue with Telegram", key="tele_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
@@ -123,14 +118,12 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይመዝገቡ ---")
-        # 🔴 Google Signup with Icon
         if st.button("🌐 Sign Up with Google", key="google_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        # 🔵 Telegram Signup with Icon
         if st.button("💬 Sign Up with Telegram", key="tele_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
@@ -149,10 +142,6 @@ def login_page():
 
 # --- MAIN CHAT PAGE ---
 def chat_page():
-    if st.session_state.play_sound:
-        play_welcome_sound()
-        st.session_state.play_sound = False
-
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     
     # Header
@@ -167,27 +156,3 @@ def chat_page():
             st.rerun()
 
     # Sidebar
-    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
-    if st.session_state.user_type == "Guest":
-        GUEST_LIMIT = 5
-        remains = GUEST_LIMIT - st.session_state.message_count
-        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
-    else:
-        st.sidebar.write("♾️ የእርስዎ የጥያቄ መጠን፦ ገደብ የለውም! (No Limit)")
-
-    # Display History
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # 🌟 Chat Bar (Premium Glass Mode)
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
-            st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
-        else:
-            st.session_state.message_count += 1
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            st.session_state.messages.append({"role": "user", "content": prompt})
-
-            ai
