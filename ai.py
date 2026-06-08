@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
@@ -53,6 +54,12 @@ if "message_count" not in st.session_state:
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
+    
+    # 🎬 የ AI ዳንስ መግቢያ ቪዲዮ (በራሱ ጊዜ የሚከፈትና ድምፅ የሌለው)
+    # ማስታወሻ፦ የራስህን የ 3 ሰከንድ የዳንስ ቪዲዮ ሊንክ እዚህ መተካት ትችላለህ
+    video_url = "https://assets.mixkit.co/videos/preview/mixkit-dancing-robot-in-a-futuristic-environment-43258-large.mp4"
+    st.video(video_url, autoplay=True, loop=True, muted=True)
+    
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
     tab1, tab2, tab3 = st.tabs(["Sign In", "Sign Up", "Guest Mode 👤"])
