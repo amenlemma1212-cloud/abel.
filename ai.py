@@ -1,30 +1,55 @@
 import streamlit as st
 import time
-from datetime import date
+import base64
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS for Animations & Glass UI
+# 2. የድምፅ አሠራር ተግባር (Welcome Sound Function)
+def play_welcome_sound():
+    # "Welcome to Abel AI" የሚለውን ድምፅ በኦዲዮ ሊንክ ማዘጋጀት
+    text = "Welcome to Abel AI"
+    # በነፃ የኦዲዮ ሊንክ መፍጠሪያ መጠቀም
+    tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q={text.replace(' ', '+')}"
+    
+    # ድምፁ በጀርባ በራሱ እንዲከፈት (Autoplay) ማድረጊያ HTML
+    audio_html = f"""
+        <audio autoplay>
+            <source src="{tts_url}" type="audio/mpeg">
+        </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
+# 3. Advanced CSS for Animations, Background & Glass UI
 st.markdown("""
     <style>
-    /* አኒሜሽን - ገጹ ከጎን ተንሸራትቶ እንዲመጣ (Slide In) */
+    /* አኒሜሽን - ገጹ ሲከፈት በታላቅ ሁኔታ በግልጽ እንዲመጣ (Zoom In Effect) */
+    @keyframes zoomIn {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    /* አኒሜሽን - ከጎን ተንሸራትቶ መግቢያ (Slide In) */
     @keyframes slideIn {
         0% { opacity: 0; transform: translateX(-50px); }
         100% { opacity: 1; transform: translateX(0); }
     }
-    /* አኒሜሽን - ለቁልፎች (Button Hover Effect) */
-    .stButton>button:hover {
-        transform: scale(1.05);
-        transition: 0.3s;
-        background-color: #FED100 !important;
-        color: black !important;
-    }
     
     .main-container {
-        animation: slideIn 0.8s ease-out;
+        animation: zoomIn 0.8s ease-out;
+    }
+    .chat-container {
+        animation: slideIn 0.6s ease-out;
     }
 
+    /* የቁልፎች አኒሜሽን (Button Hover) */
+    .stButton>button:hover {
+        transform: scale(1.08) translateY(-2px);
+        transition: 0.2s ease-in-out;
+        background-color: #FED100 !important;
+        color: black !important;
+        box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.4);
+    }
+    
     /* የኢትዮጵያ ባንዲራ ጀርባ */
     .stApp {
         background: linear-gradient(180deg, #009A44 0%, #FED100 50%, #EF4123 100%);
@@ -41,15 +66,17 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (ማስታወሻዎች)
+# 4. Session State (ማስታወሻዎች)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
-    st.session_state.user_type = None # "Member" or "Guest"
+    st.session_state.user_type = None 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
+if "play_sound" not in st.session_state:
+    st.session_state.play_sound = False
 
 # --- SIGN IN / SIGN UP / GUEST PAGE ---
 def login_page():
@@ -67,6 +94,7 @@ def login_page():
             if user and pwd:
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
+                st.session_state.play_sound = True # ድምፁ እንዲከፈት መፍቀድ
                 st.rerun()
             else:
                 st.error("ስም እና የይለፍ ቃል ያስገቡ")
@@ -79,25 +107,32 @@ def login_page():
         if st.button("Sign Up & Start"):
             if new_user and new_pwd:
                 with st.spinner('አካውንት እየተፈጠረ ነው...'):
-                    time.sleep(1.5)
+                    time.sleep(1)
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
+                st.session_state.play_sound = True # ድምፁ እንዲከፈት መፍቀድ
                 st.rerun()
             else:
                 st.error("ሁሉንም ቦታዎች ይሙሉ")
 
     with tab3:
         st.subheader("በእንግድነት ይግቡ")
-        st.write("አካውንት መክፈት አያስፈልግዎትም (ጥያቄዎ ግን ሊገደብ ይችላል)።")
+        st.write("አካውንት ሳይከፍቱ ይሞክሩ (የ 5 ጥያቄ ገደብ አለው)።")
         if st.button("Enter as Guest"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
+            st.session_state.play_sound = True # ድምፁ እንዲከፈት መፍቀድ
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- MAIN CHAT PAGE ---
 def chat_page():
-    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    # መግቢያው ሲከፈት ድምፅ አንድ ጊዜ ብቻ እንዲጫወት ማድረግ
+    if st.session_state.play_sound:
+        play_welcome_sound()
+        st.session_state.play_sound = False # ድምፁ ደጋግሞ እንዳይረብሽ መዝጋት
+
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     
     # Header
     col1, col2 = st.columns([4, 1])
@@ -107,15 +142,18 @@ def chat_page():
     with col2:
         if st.button("Exit"):
             st.session_state.logged_in = False
-            st.session_state.messages = [] # ታሪክን ማጽዳት
+            st.session_state.messages = [] 
+            st.session_state.message_count = 0
             st.rerun()
 
-    # Daily Limit Logic (Guest gets 5, Members get 30)
-    limit = 30 if st.session_state.user_type == "Member" else 5
-    remains = limit - st.session_state.message_count
-    
+    # Sidebar
     st.sidebar.markdown(f"### 📊 የእርስዎ ደረጃ: {st.session_state.user_type}")
-    st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {limit}")
+    if st.session_state.user_type == "Guest":
+        GUEST_LIMIT = 5
+        remains = GUEST_LIMIT - st.session_state.message_count
+        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
+    else:
+        st.sidebar.write("♾️ የእርስዎ የጥያቄ መጠን፦ ገደብ የለውም! (No Limit)")
 
     # Display History
     for message in st.session_state.messages:
@@ -124,8 +162,8 @@ def chat_page():
 
     # Chat Bar
     if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        if st.session_state.message_count >= limit:
-            st.error(f"⚠️ የ {limit} ጥያቄ ገደብዎ አልቋል።")
+        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
+            st.error("⚠️ የእንግዳ Mode የ 5 ጥያቄ ገደብዎ አልቋል! እባክዎ አካውንት ይፍጠሩ።")
         else:
             st.session_state.message_count += 1
             with st.chat_message("user"):
@@ -144,3 +182,4 @@ if not st.session_state.logged_in:
     login_page()
 else:
     chat_page()
+    
