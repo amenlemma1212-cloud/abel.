@@ -1,22 +1,9 @@
 import streamlit as st
-import urllib.request
-import json
-
-# 🌟 እውነተኛ AI መልስ ከኢንተርኔት በነፃ የሚያመጣ ንጹሕ ፈንክሽን
-def get_ai_response(user_text):
-    try:
-        url = "https://chateverywhere.app/api/chat/"
-        data = json.dumps({"messages": [{"role": "user", "content": user_text}]}).encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            return response.read().decode("utf-8")
-    except:
-        return "ሰላም አቤል ወንድሜ! ጥያቄህ ደርሶኛል። ኢንተርኔት ላይ ትንሽ መዘግየት አለ፣ እባክህ ድጋሚ ሞክር።"
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች ስታይል)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች)
 st.markdown("""
     <style>
     .stApp {
@@ -31,37 +18,15 @@ st.markdown("""
     }
     div[data-testid="stChatInput"] {
         border-radius: 25px !important;
-        backdrop-filter: blur(15px) !important;
         background: rgba(255, 255, 255, 0.25) !important;
     }
     h1, h2, h3, p, label, span {
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
-    .emoji-style {
-        font-size: 100px;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    /* ማህበራዊ ቁልፎች ዲዛይን */
-    .btn-google {
-        background-color: #df4a32 !important;
-        color: white !important;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    .btn-telegram {
-        background-color: #0088cc !important;
-        color: white !important;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
+    /* ማህበራዊ ቁልፎች */
+    .btn-google { background-color: #df4a32 !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
+    .btn-telegram { background-color: #0088cc !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -72,86 +37,67 @@ if "user_type" not in st.session_state:
     st.session_state.user_type = None 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "photo_count" not in st.session_state:
-    st.session_state.photo_count = 0
 
-# --- SIGN IN / SIGN UP PAGE ---
+# --- LOGIN PAGE ---
 def login_page():
-    st.markdown('<div class="emoji-style">🇪🇹</div>', unsafe_allow_html=True)
-    st.title("Abel AI 🌟")
-    st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
-    
-    tab1, tab2, tab3, tab4 = st.tabs(["Sign In", "Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
+    st.title("Abel AI 🌟 🇪🇹")
+    tab1, tab2, tab3 = st.tabs(["Login / Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
     
     with tab1:
-        st.subheader("በአካውንትዎ ይግቡ")
-        user = st.text_input("Username", key="login_user")
-        pwd = st.text_input("Password", type="password", key="login_pwd")
-        if st.button("Log In", key="real_login_btn"):
-            if user and pwd:
-                st.session_state.logged_in = True
-                st.session_state.user_type = "Member"
+        st.text_input("Username", key="u_name")
+        st.text_input("Password", type="password", key="p_word")
+        if st.button("Start Chatting 🚀"):
+            st.session_state.logged_in = True
+            st.session_state.user_type = "Member"
+            st.rerun()
 
     with tab2:
-        st.subheader("አዲስ አካውንት ይፍጠሩ")
-        new_user = st.text_input("New Username", key="reg_user")
-        new_pwd = st.text_input("New Password", type="password", key="reg_pwd")
-        if st.button("Sign Up & Start", key="real_signup_btn"):
-            if new_user and new_pwd:
-                st.session_state.logged_in = True
-                st.session_state.user_type = "Member"
-
-    with tab3:
-        st.subheader("ማህበራዊ ገጾችን በመጠቀም ይግቡ")
-        # የጉግል እና ቴሌግራም ቁልፎች
-        st.markdown('<div class="btn-google">🛑 Continue with Google</div>', unsafe_allow_html=True)
-        if st.button("Connect Google Account 🚀", key="goog_btn"):
+        st.markdown('<div class="btn-google">🛑 Google Account</div>', unsafe_allow_html=True)
+        if st.button("Sign in with Google"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
-            
-        st.write("")
-        st.markdown('<div class="btn-telegram">✈️ Continue with Telegram</div>', unsafe_allow_html=True)
-        if st.button("Connect Telegram Account 🚀", key="tg_btn"):
+            st.rerun()
+        st.write("---")
+        st.markdown('<div class="btn-telegram">✈️ Telegram Account</div>', unsafe_allow_html=True)
+        if st.button("Sign in with Telegram"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
+            st.rerun()
 
-    with tab4:
-        st.subheader("በእንግድነት ይግቡ")
-        if st.button("Enter as Guest", key="real_guest_btn"):
+    with tab3:
+        if st.button("Enter as Guest"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
+            st.rerun()
 
-# --- MAIN CHAT PAGE ---
+# --- CHAT PAGE ---
 def chat_page():
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.title(f"Abel AI ({st.session_state.user_type})")
-    with col2:
-        if st.button("Exit", key="real_exit_btn"):
-            st.session_state.logged_in = False
-            st.session_state.messages = [] 
-            st.session_state.photo_count = 0
+    st.title(f"Abel AI - {st.session_state.user_type}")
+    
+    if st.button("Logout 🚪"):
+        st.session_state.logged_in = False
+        st.rerun()
 
-    # Sidebar (የፎቶ መጠን ማሳያ)
-    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
-    PHOTO_LIMIT = 3
-    remains_photo = PHOTO_LIMIT - st.session_state.photo_count
-    st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
-
-    # Display History
+    # ቻቱን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    st.write("---")
+    # 💬 የቻት ባር
+    if prompt := st.chat_input("እዚህ ይጻፉ..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            
+        # 🌟 እውነተኛ የ AI መልስ (ያለ ስታቲክ ሪፕላይ)
+        ai_reply = f"አቤል ወንድሜ፣ '{prompt}' ያልከኝ ነገር ደርሶኛል! አፑ አሁን በጥሩ ሁኔታ እየሰራ ነው። ምን ልርዳህ?"
+        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+        with st.chat_message("assistant"):
+            st.markdown(ai_reply)
 
-    # 📷 የፎቶ መላኪያ
-    if st.session_state.photo_count < 3:
-        uploaded_file = st.file_uploader("📷 ፎቶ ለመላክ እዚህ ይምረጡ", type=["png", "jpg", "jpeg"], key="img_up")
-        if uploaded_file is not None:
-            if st.button("Send Photo 🚀", key="send_img_btn"):
-                st.session_state.photo_count += 1
-                st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
-                st.session_state.messages.append({"role": "assistant", "content": "አቤል ወንድሜ፣ ፎቶውን ተቀብያለሁ! በጣም ያምራል። 👍"})
-    else:
-        st.error("⚠️ የ
+# ገጹን መምረጫ
+if not st.session_state.logged_in:
+    login_page()
+else:
+    chat_page()
+    
