@@ -1,9 +1,22 @@
 import streamlit as st
+import urllib.request
+import json
+
+# 🌟 እውነተኛ AI መልስ ከኢንተርኔት በነፃ የሚያመጣ ንጹሕ ፈንክሽን
+def get_ai_response(user_text):
+    try:
+        url = "https://chateverywhere.app/api/chat/"
+        data = json.dumps({"messages": [{"role": "user", "content": user_text}]}).encode("utf-8")
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            return response.read().decode("utf-8")
+    except:
+        return "ሰላም አቤል ወንድሜ! ጥያቄህ ደርሶኛል። ኢንተርኔት ላይ ትንሽ መዘግየት አለ፣ እባክህ ድጋሚ ሞክር።"
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS (Ethiopia Flag Theme)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች ስታይል)
 st.markdown("""
     <style>
     .stApp {
@@ -21,9 +34,6 @@ st.markdown("""
         backdrop-filter: blur(15px) !important;
         background: rgba(255, 255, 255, 0.25) !important;
     }
-    div[data-testid="stChatInput"] textarea {
-        color: white !important;
-    }
     h1, h2, h3, p, label, span {
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
@@ -33,24 +43,29 @@ st.markdown("""
         text-align: center;
         margin-bottom: 10px;
     }
-    /* ማህበራዊ ሚዲያ ቁልፎች ዲዛይን */
-    .social-btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.3);
-        border: 1px solid white;
-        padding: 10px;
-        border-radius: 10px;
+    /* ማህበራዊ ቁልፎች ዲዛይን */
+    .btn-google {
+        background-color: #df4a32 !important;
         color: white !important;
-        text-decoration: none;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .btn-telegram {
+        background-color: #0088cc !important;
+        color: white !important;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
         font-weight: bold;
         margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (ማህደረ ትውስታ)
+# 3. Session State (የአፑ ማህደረ ትውስታ)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -60,21 +75,83 @@ if "messages" not in st.session_state:
 if "photo_count" not in st.session_state:
     st.session_state.photo_count = 0
 
-# 🌟 ለጥያቄዎች ምርጥ ምክር (Advice) መስጫ ፈንክሽን
-def get_ai_advice(user_prompt):
-    p = user_prompt.lower()
-    # ስለ ኮምፒውተር ወይም ስልክ መሞቅ
-    if "hot" in p or "overheat" in p or "fan" in p:
-        return "💡 **የአቤል AI ምክር፦** ኮምፒውተርህ በጣም የሚሞቅ ከሆነ በጀርባ የሚሰሩ አላስፈላጊ ፕሮግራሞችን ዝጋ። የላፕቶፕህን ፕሮሰሰር ፍጥነት ለመቆጣጠር በሊኑክስ ላይ 'auto-cpufreq' መጠቀም ትችላለህ። እንዲሁም የአየር ማስወጫ ቀዳዳው እንዳይደፈን ጠረጴዛ ላይ አስቀምጠው።"
-    # ስለ ቪዲዮ ኤዲቲንግ ወይም ዩቲዩብ
-    elif "video" in p or "edit" in p or "youtube" in p or "phonk" in p:
-        return "💡 **የአቤል AI ምክር፦** በዩቲዩብ ቻናልህ ስኬታማ ለመሆን በየቀኑ አጫጭር ቪዲዮዎችን (Shorts) በጥራት ልቀቅ። ለቪዲዮዎችህ ሳቢ 'Whoosh' እና 'Impact' የድምፅ ተፅዕኖዎችን (Sound Effects) ተጠቀም። በስልክህም ቢሆን በCapCut ምርጥ ኤዲት መስራት ትችላለህ!"
-    # ስለ ጌም
-    elif "game" in p or "roblox" in p or "gta" in p:
-        return "💡 **የአቤል AI ምክር፦** ጌም በሚጫወትበት ጊዜ ፍጥነቱ እንዲጨምር የጌሙን ግራፊክስ (Graphics Quality) ወደ 'Low' ቀይረው። እንዲሁም ላፕቶፕህ በቻርጀር መሰካቱን አረጋግጥ፤ ይሄ የግራፊክስ ካርዱ ሙሉ አቅሙን እንዲጠቀም ይረዳዋል።"
-    # ስለ ቋንቋ ወይም ትምህርት
-    elif "english" in p or "learn" in p or "amharic" in p:
-        return "💡 **የአቤል AI ምክር፦** እንግሊዘኛህን ለማሳደግ በየቀኑ አዳዲስ ቃላትን በደብተርህ ላይ መጻፍ እና መለማመድ ትልቅ ለውጥ ያመጣል። በርታ!"
-    # ለሌሎች አጠቃላይ ጥያቄዎች
+# --- SIGN IN / SIGN UP PAGE ---
+def login_page():
+    st.markdown('<div class="emoji-style">🇪🇹</div>', unsafe_allow_html=True)
+    st.title("Abel AI 🌟")
+    st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
+    
+    tab1, tab2, tab3, tab4 = st.tabs(["Sign In", "Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
+    
+    with tab1:
+        st.subheader("በአካውንትዎ ይግቡ")
+        user = st.text_input("Username", key="login_user")
+        pwd = st.text_input("Password", type="password", key="login_pwd")
+        if st.button("Log In", key="real_login_btn"):
+            if user and pwd:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "Member"
+
+    with tab2:
+        st.subheader("አዲስ አካውንት ይፍጠሩ")
+        new_user = st.text_input("New Username", key="reg_user")
+        new_pwd = st.text_input("New Password", type="password", key="reg_pwd")
+        if st.button("Sign Up & Start", key="real_signup_btn"):
+            if new_user and new_pwd:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "Member"
+
+    with tab3:
+        st.subheader("ማህበራዊ ገጾችን በመጠቀም ይግቡ")
+        # የጉግል እና ቴሌግራም ቁልፎች
+        st.markdown('<div class="btn-google">🛑 Continue with Google</div>', unsafe_allow_html=True)
+        if st.button("Connect Google Account 🚀", key="goog_btn"):
+            st.session_state.logged_in = True
+            st.session_state.user_type = "Google User"
+            
+        st.write("")
+        st.markdown('<div class="btn-telegram">✈️ Continue with Telegram</div>', unsafe_allow_html=True)
+        if st.button("Connect Telegram Account 🚀", key="tg_btn"):
+            st.session_state.logged_in = True
+            st.session_state.user_type = "Telegram User"
+
+    with tab4:
+        st.subheader("በእንግድነት ይግቡ")
+        if st.button("Enter as Guest", key="real_guest_btn"):
+            st.session_state.logged_in = True
+            st.session_state.user_type = "Guest"
+
+# --- MAIN CHAT PAGE ---
+def chat_page():
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.title(f"Abel AI ({st.session_state.user_type})")
+    with col2:
+        if st.button("Exit", key="real_exit_btn"):
+            st.session_state.logged_in = False
+            st.session_state.messages = [] 
+            st.session_state.photo_count = 0
+
+    # Sidebar (የፎቶ መጠን ማሳያ)
+    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
+    PHOTO_LIMIT = 3
+    remains_photo = PHOTO_LIMIT - st.session_state.photo_count
+    st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
+
+    # Display History
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    st.write("---")
+
+    # 📷 የፎቶ መላኪያ
+    if st.session_state.photo_count < 3:
+        uploaded_file = st.file_uploader("📷 ፎቶ ለመላክ እዚህ ይምረጡ", type=["png", "jpg", "jpeg"], key="img_up")
+        if uploaded_file is not None:
+            if st.button("Send Photo 🚀", key="send_img_btn"):
+                st.session_state.photo_count += 1
+                st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
+                st.session_state.messages.append({"role": "assistant", "content": "አቤል ወንድሜ፣ ፎቶውን ተቀብያለሁ! በጣም ያምራል። 👍"})
     else:
-        return "💡 **የአቤል AI ምክር፦** ሀሳብህ በጣም ጥሩ ነው። ማንኛውንም የቴክኖሎጂ ችግር ለመ
+        st.error("⚠️ የ
