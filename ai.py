@@ -1,10 +1,9 @@
 import streamlit as st
-import time
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Simplified CSS (Ethiopia Flag + Premium Glass Chat Bar)
+# 2. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar)
 st.markdown("""
     <style>
     /* የኢትዮጵያ ባንዲራ ጀርባ */
@@ -38,6 +37,13 @@ st.markdown("""
         color: white !important;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
     }
+    
+    /* ቪዲዮው መሃል ላይ እንዲሆን ማድረጊያ */
+    .video-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -55,10 +61,15 @@ if "message_count" not in st.session_state:
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     
-    # 🎬 የ AI ዳንስ መግቢያ ቪዲዮ (በራሱ ጊዜ የሚከፈትና ድምፅ የሌለው)
-    # ማስታወሻ፦ የራስህን የ 3 ሰከንድ የዳንስ ቪዲዮ ሊንክ እዚህ መተካት ትችላለህ
-    video_url = "https://assets.mixkit.co/videos/preview/mixkit-dancing-robot-in-a-futuristic-environment-43258-large.mp4"
-    st.video(video_url, autoplay=True, loop=True, muted=True)
+    # 🎬 የ AI ዳንስ ቪዲዮ በHTML (ብሮውዘሩ ሳይከለክለው በቀጥታ Autoplay እንዲሆን ያደርገዋል)
+    video_html = """
+    <div class="video-container">
+        <iframe src="https://player.vimeo.com/video/1004381363?autoplay=1&loop=1&muted=1&background=1" 
+                width="100%" height="250" frameborder="0" allow="autoplay; fullscreen" allowfullscreen>
+        </iframe>
+    </div>
+    """
+    st.markdown(video_html, unsafe_allow_html=True)
     
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
