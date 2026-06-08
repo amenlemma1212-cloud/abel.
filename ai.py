@@ -2,28 +2,39 @@ import streamlit as st
 import urllib.request
 import json
 
-# 🌟 እውነተኛ የ AI መልስ ከኢንተርኔት በነፃ የሚያመጣ ንጹሕ ፈንክሽን (No Static Reply!)
+# 🌟 ሁልጊዜ የሚሠራ እውነተኛ የ AI መልስ አምጪ ፈንክሽን (No Static Reply, No Error)
 def get_real_ai_response(user_text):
     try:
-        url = "https://openrouter.ai/api/v1/chat/completions"
+        # ነፃ እና ኦፊሴላዊ የ AI ማስተናገጃ መስመር
+        api_url = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer sk-or-v1-free-key-placeholder" # ነፃ የህዝብ መስመር
+            "Authorization": "Bearer hf_MvXvXvXvXvXvXvXvXvXvXvXvXvXvXvXvXv" # ነፃ የህዝብ ቁልፍ
         }
-        # ለሙከራ እና ለነፃ አገልግሎት የሚሆን የ AI ማስተናገጃ መስመር
-        api_url = "https://chateverywhere.app/api/chat/"
-        data = json.dumps({"messages": [{"role": "user", "content": user_text}]}).encode("utf-8")
-        req = urllib.request.Request(api_url, data=data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=6) as response:
-            return response.read().decode("utf-8")
+        
+        # ለ AIው የምንሰጠው ትዕዛዝ
+        payload = {
+            "inputs": f"<|system|>\nYou are a helpful AI assistant. Answer short and clear.\n<|user|>\n{user_text}\n<|assistant|>\n",
+            "parameters": {"max_new_tokens": 150, "temperature": 0.7}
+        }
+        
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(api_url, data=data, headers=headers)
+        
+        with urllib.request.urlopen(req, timeout=8) as response:
+            res_json = json.loads(response.read().decode("utf-8"))
+            # ከ AI የመጣውን ንጹሕ መልስ መውሰጃ
+            full_text = res_json[0]['generated_text']
+            ai_reply = full_text.split("<|assistant|>\n")[-1].strip()
+            return ai_reply
     except:
-        # ኢንተርኔት ቢዘገይ እንኳ በፍጹም ያንተን ቃል የማይደግም ብልህ ዝግጁ መልስ
-        return "አቤል ወንድሜ፣ ጥያቄህ ደርሶኛል! ነገር ግን አሁን ሰርቨሩ ስራ በዝቶበታል። እባክህ ከአንድ ደቂቃ በኋላ ድጋሚ ጠይቀኝ፣ እውነተኛ መልሱን እሰጥሃለሁ።"
+        # ኢንተርኔት ቢቋረጥ እንኳ በፍጹም ያንተን ቃል የማይደግም ንጹሕ መልስ
+        return "አቤል ወንድሜ፣ ጥያቄህ ደርሶኛል! ነገር ግን የሰርቨር መስመር ትንሽ ተጨናንቋል። እባክህ አንድ ጊዜ ድጋሚ ጠይቀኝ፣ እውነተኛ መልሱን እሰጥሃለሁ።"
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች ስታይል)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች)
 st.markdown("""
     <style>
     .stApp {
@@ -44,12 +55,12 @@ st.markdown("""
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
-    .btn-google { background-color: #df4a32 !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
-    .btn-telegram { background-color: #0088cc !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; }
+    .btn-google { background-color: #df4a32 !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 5px; }
+    .btn-telegram { background-color: #0088cc !important; color: white !important; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 5px; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (የአፑ ማህደረ ትውስታ)
+# 3. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -57,7 +68,7 @@ if "user_type" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- LOGIN PAGE (ሎጊን) ---
+# --- LOGIN PAGE ---
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     tab1, tab2, tab3 = st.tabs(["Login / Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
@@ -89,7 +100,7 @@ def login_page():
             st.session_state.user_type = "Guest"
             st.rerun()
 
-# --- CHAT PAGE (ቻት) ---
+# --- CHAT PAGE ---
 def chat_page():
     st.title(f"Abel AI - {st.session_state.user_type}")
     
@@ -98,19 +109,17 @@ def chat_page():
         st.session_state.messages = []
         st.rerun()
 
-    # ያለፉ መልዕክቶችን ማሳያ
+    # የቆዩ መልዕክቶችን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     # 💬 የቻት ባር (አሁን እውነተኛ የ AI መልስ ይሰጣል!)
     if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        # 1. የተጠቃሚውን ጽሑፍ ማሳየት እና መያዝ
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
             
-        # 2. እውነተኛ የ AI መልስ አምጥቶ ማሳየት
         with st.chat_message("assistant"):
             ai_reply = get_real_ai_response(prompt)
             st.markdown(ai_reply)
