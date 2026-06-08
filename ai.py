@@ -1,21 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 🌟 የላቀውን የጌሚኒ AI አእምሮ በደህንነት ማንቂያ ማዘጋጃ ፈንክሽን
-def get_gemini_response(user_text, api_key_input):
+# 🌟 ከ Streamlit Secrets ላይ የ API Key ወስዶ እውነተኛ AI መልስ የሚሰጥ ፈንክሽን
+def get_gemini_response(user_text):
     try:
-        # አንተ ያስገባኸውን API Key እዚህ ጋር ያገናኘዋል
-        genai.configure(api_key=api_key_input)
+        # Streamlit ላይ የደበቅከውን ቁልፍ በራሱ ያነባል
+        api_key = st.secrets["GEMINI_API_KEY"]
+        genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(user_text)
         return response.text
     except Exception as e:
-        return f"⚠️ የ API Key ስህተት አለ ወይም አልተገናኘም። እባክህ ትክክለኛውን የ Gemini API Key ማስገባትህን አረጋግጥ።"
+        return "⚠️ አቤል ወንድሜ፣ Streamlit Secrets ላይ 'GEMINI_API_KEY' የሚለውን ቁልፍ በትክክል መደበቅህን አረጋግጥ።"
 
-# Page Configuration
+# 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# Premium CSS (Ethiopia Flag Theme)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች)
 st.markdown("""
     <style>
     .stApp {
@@ -41,7 +42,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Session State
+# 3. Session State (የአፑ ማህደረ ትውስታ)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -81,10 +82,7 @@ def login_page():
 def chat_page():
     st.title(f"Abel AI - {st.session_state.user_type}")
     
-    # 🔑 እዚህ ጋር የራስህን API Key በደህና ማስገባት ትችላለህ
-    my_key = st.sidebar.text_input("የእርስዎን Gemini API Key ያስገቡ", type="password", help="ከ Google AI Studio ያገኙትን ቁልፍ እዚህ ይለጥፉ")
-
-    if st.sidebar.button("Logout 🚪"):
+    if st.button("Logout 🚪"):
         st.session_state.logged_in = False
         st.session_state.messages = []
 
@@ -93,18 +91,14 @@ def chat_page():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር
+    # 💬 የቻት ባር (አሁን በድብቁ ቁልፍ እውነተኛ መልስ ይሰጣል)
     if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
             
         with st.chat_message("assistant"):
-            if my_key:
-                # 🌟 እውነተኛ AI መልስ ይሰጣል
-                ai_reply = get_gemini_response(prompt, my_key)
-            else:
-                ai_reply = "⚠️ እባክህ መጀመሪያ በስተግራ በኩል ባለው ሳጥን (Sidebar) ላይ የ Gemini API Key ህን አስገባ አቤል ወንድሜ።"
+            ai_reply = get_gemini_response(prompt)
             st.markdown(ai_reply)
             
         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
