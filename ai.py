@@ -32,22 +32,23 @@ st.markdown("""
         color: white !important;
     }
     
-    /* ጽሑፎች በደንብ እንዲታዩ ማድረጊያ */
+    /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
     h1, h2, h3, p, label {
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
 
-    /* የፎቶው ስታይል */
-    .flag-photo {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-        max-width: 500px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    /* የባንዲራ ፎቶ ማማጠኛ ስታይል */
+    .flag-box {
+        display: flex;
+        justify-content: center;
         margin-bottom: 20px;
+    }
+    .flag-box img {
+        width: 100%;
+        max-width: 450px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -66,8 +67,13 @@ if "message_count" not in st.session_state:
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     
-    # 🇪🇹 የኢትዮጵያ ባንዲራ ፎቶ (High Quality Image)
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/1200px-Flag_of_Ethiopia.svg.png", use_container_width=True)
+    # 🇪🇹 የኢትዮጵያ ባንዲራ ፎቶ በHTML (ይህ ስልት በጭራሽ ኤረር አይሰጥም)
+    flag_html = """
+    <div class="flag-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/1200px-Flag_of_Ethiopia.svg.png" alt="Ethiopia Flag">
+    </div>
+    """
+    st.markdown(flag_html, unsafe_allow_html=True)
     
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
@@ -119,16 +125,4 @@ def login_page():
         st.subheader("በእንግድነት ይግቡ")
         if st.button("Enter as Guest", key="real_guest_btn"):
             st.session_state.logged_in = True
-            st.session_state.user_type = "Guest"
-            st.rerun()
-
-# --- MAIN CHAT PAGE ---
-def chat_page():
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.title(f"Abel AI ({st.session_state.user_type})")
-    with col2:
-        if st.button("Exit", key="real_exit_btn"):
-            st.session_state.logged_in = False
-            st.session_state.messages = [] 
-            st.session_state.message_count =
+            
