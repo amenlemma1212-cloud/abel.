@@ -13,7 +13,7 @@ st.markdown("""
     }
 
     /* የመስታወት መልክ ለካርዶች እና ለTabs */
-    div[data-testid="stChatMessage"], .stTabs {
+    div[data-testid="stChatMessage"], .stTabs, .stExpander {
         border-radius: 15px !important;
         backdrop-filter: blur(10px) !important;
         background: rgba(255, 255, 255, 0.2) !important;
@@ -33,12 +33,11 @@ st.markdown("""
     }
     
     /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
-    h1, h2, h3, p, label {
+    h1, h2, h3, p, label, span {
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
 
-    /* የኢሞጂ ማሳያ ስታይል */
     .emoji-style {
         font-size: 100px;
         text-align: center;
@@ -47,7 +46,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State
+# 3. Session State (ማስታወሻዎች)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -56,6 +55,9 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
+# 📷 የፎቶ መቁጠሪያ ብቻ (Limit: 3)
+if "photo_count" not in st.session_state:
+    st.session_state.photo_count = 0
 
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
@@ -74,17 +76,6 @@ def login_page():
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
                 st.rerun()
-        
-        st.write("--- ወይም በዚህ ይግቡ ---")
-        if st.button("🌐 Continue with Google", key="google_login_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Google User"
-            st.rerun()
-            
-        if st.button("💬 Continue with Telegram", key="tele_login_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Telegram User"
-            st.rerun()
 
     with tab2:
         st.subheader("አዲስ አካውንት ይፍጠሩ")
@@ -95,17 +86,6 @@ def login_page():
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
                 st.rerun()
-        
-        st.write("--- ወይም በዚህ ይመዝገቡ ---")
-        if st.button("🌐 Sign Up with Google", key="google_reg_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Google User"
-            st.rerun()
-            
-        if st.button("💬 Sign Up with Telegram", key="tele_reg_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Telegram User"
-            st.rerun()
 
     with tab3:
         st.subheader("በእንግድነት ይግቡ")
@@ -124,35 +104,43 @@ def chat_page():
             st.session_state.logged_in = False
             st.session_state.messages = [] 
             st.session_state.message_count = 0
+            st.session_state.photo_count = 0
             st.rerun()
 
+    # Sidebar (መጠን ማሳያ)
     st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
-    if st.session_state.user_type == "Guest":
-        GUEST_LIMIT = 5
-        remains = GUEST_LIMIT - st.session_state.message_count
-        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
-    else:
-        st.sidebar.write("♾️ ጥያቄ፦ ገደብ የለውም!")
+    PHOTO_LIMIT = 3
+    remains_photo = PHOTO_LIMIT - st.session_state.photo_count
+    st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
+    st.sidebar.write(f"🎤 ድምፅ፦ ገደብ የለውም! (No Limit)")
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # 📷 🎤 የፎቶ እና ድምፅ መላኪያ
+    with st.expander("📷 ፎቶ ወይም 🎤 ድምፅ ለመላክ እዚህ ይጫኑ"):
+        col_img, col_aud = st.columns(2)
+        
+        with col_img:
+            # 🌟 የፎቶ ገደብ ቼክ
+            if st.session_state.photo_count >= 3:
+                st.error("⚠️ የፎቶ መላኪያ ገደብዎ (3) አልቋል!")
+            else:
+                uploaded_file = st.file_uploader("📷 Upload Image", type=["png", "jpg", "jpeg"], key="img_up")
+                if uploaded_file is not None:
+                    if st.button("Send Photo 🚀", key="send_img_btn"):
+                        st.session_state.photo_count += 1
+                        st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
+                        st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን አይቶታል። በጣም ያምራል! 👍"})
+                        st.rerun()
 
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
-            st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
-        else:
-            st.session_state.message_count += 1
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"
-            with st.chat_message("assistant"):
-                st.markdown(ai_reply)
-            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-            st.rerun() 
+        with col_aud:
+            # 🌟 ድምፅ ያለምንም ገደብ (No Limit)
+            audio_file = st.audio_input("🎤 Record Audio", key="audio_up")
+            if audio_file is not None:
+                if st.button("Send Voice 🚀", key="send_aud_btn"):
+                    st.session_state.messages.append({"role": "user", "content": "🎤 [የድምፅ መልዕክት ተልኳል]"})
+                    st.session_state.messages.append({"role": "assistant", "content": "አቤል AI የድምፅ መልዕክትህን ሰምቶታል። 👂"})
+                    st.rerun()
 
-if not st.session_state.logged_in:
-    login_page()
-else:
-    chat_page()
+    st.write("---")
+
+    # Display History
+    for message in st
