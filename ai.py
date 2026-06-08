@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Premium CSS (የኢትዮጵያ ባንዲራ እና የሎጊን ቁልፎች ዲዛይን)
+# 2. Premium CSS (የኢትዮጵያ ባንዲራ + የTG እና Google ቁልፎች)
 st.markdown("""
     <style>
     .stApp {
@@ -29,7 +29,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (የአፑ ማህደረ ትውስታ)
+# 3. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -37,7 +37,7 @@ if "user_type" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- LOGIN PAGE (ሎጊን) ---
+# --- LOGIN PAGE ---
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     tab1, tab2, tab3 = st.tabs(["Login / Sign Up", "Social Logins 🌐", "Guest Mode 👤"])
@@ -69,28 +69,26 @@ def login_page():
             st.session_state.user_type = "Guest"
             st.rerun()
 
-# --- CHAT PAGE (ቻት) ---
+# --- CHAT PAGE ---
 def chat_page():
     st.title(f"Abel AI - {st.session_state.user_type}")
     
     if st.button("Logout 🚪"):
         st.session_state.logged_in = False
-        st.session_state.messages = []
         st.rerun()
 
-    # ያለፉ መልዕክቶችን ማሳያ
+    # ቻቱን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር (የ AI መልስ ጽሑፍ ሙሉ በሙሉ ተሰርዟል!)
+    # 💬 የቻት ባር (የ AI መልስ ሙሉ በሙሉ ተሰርዟል!)
     if prompt := st.chat_input("እዚህ ይጻፉ..."):
-        # አንተ የጻፍከውን ብቻ ያስቀምጣል
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-# ገጹን መቆጣጠሪያ
+# ገጹን መምረጫ
 if not st.session_state.logged_in:
     login_page()
 else:
