@@ -1,17 +1,4 @@
 import streamlit as st
-import google.generativeai as genai
-
-# 🌟 ከ Streamlit Secrets ላይ የ API Key ወስዶ እውነተኛ AI መልስ የሚሰጥ ፈንክሽን
-def get_gemini_response(user_text):
-    try:
-        # Streamlit ላይ የደበቅከውን ቁልፍ በራሱ ያነባል
-        api_key = st.secrets["GEMINI_API_KEY"]
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(user_text)
-        return response.text
-    except Exception as e:
-        return "⚠️ አቤል ወንድሜ፣ Streamlit Secrets ላይ 'GEMINI_API_KEY' የሚለውን ቁልፍ በትክክል መደበቅህን አረጋግጥ።"
 
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
@@ -42,7 +29,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (የአፑ ማህደረ ትውስታ)
+# 3. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -86,22 +73,16 @@ def chat_page():
         st.session_state.logged_in = False
         st.session_state.messages = []
 
-    # የቆዩ መልዕክቶችን ማሳያ
+    # ቻቱን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር (አሁን በድብቁ ቁልፍ እውነተኛ መልስ ይሰጣል)
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+    # 💬 የቻት ባር (የ AI መልስ ጽሑፍ ሙሉ በሙሉ ተሰርዟል!)
+    if prompt := st.chat_input("እዚህ ይጻፉ..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-            
-        with st.chat_message("assistant"):
-            ai_reply = get_gemini_response(prompt)
-            st.markdown(ai_reply)
-            
-        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
 
 # ገጹን መቆጣጠሪያ
 if not st.session_state.logged_in:
