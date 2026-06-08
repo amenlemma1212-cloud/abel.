@@ -4,7 +4,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. የድምፅ አሠራር ተግባር (Welcome Sound)
+# 2. Welcome Sound Function
 def play_welcome_sound():
     text = "Welcome to Abel AI"
     tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q={text.replace(' ', '+')}"
@@ -39,29 +39,6 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
-
-    /* የGoogle ቁልፍ ስታይል */
-    .google-btn {
-        background-color: #ffffff !important;
-        color: #4285F4 !important;
-        font-weight: bold;
-        border-radius: 10px;
-        border: none;
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    /* የTelegram ቁልፍ ስታይል */
-    .telegram-btn {
-        background-color: #0088cc !important;
-        color: white !important;
-        font-weight: bold;
-        border-radius: 10px;
-        border: none;
-        padding: 10px;
-        width: 100%;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -89,7 +66,7 @@ def login_page():
         st.subheader("በአካውንትዎ ይግቡ")
         user = st.text_input("Username", key="login_user")
         pwd = st.text_input("Password", type="password", key="login_pwd")
-        if st.button("Log In", key="btn_login"):
+        if st.button("Log In", key="real_login_btn"):
             if user and pwd:
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
@@ -97,14 +74,13 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይግቡ ---")
-        # Google & Telegram Buttons for Login
-        if st.button("🔴 Continue with Google", key="google_login"):
+        if st.button("🔴 Continue with Google", key="google_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        if st.button("🔵 Continue with Telegram", key="tele_login"):
+        if st.button("🔵 Continue with Telegram", key="tele_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
             st.session_state.play_sound = True
@@ -114,7 +90,7 @@ def login_page():
         st.subheader("አዲስ አካውንት ይፍጠሩ")
         new_user = st.text_input("New Username", key="reg_user")
         new_pwd = st.text_input("New Password", type="password", key="reg_pwd")
-        if st.button("Sign Up & Start", key="btn_signup"):
+        if st.button("Sign Up & Start", key="real_signup_btn"):
             if new_user and new_pwd:
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
@@ -122,14 +98,13 @@ def login_page():
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይመዝገቡ ---")
-        # Google & Telegram Buttons for Signup
-        if st.button("🔴 Sign Up with Google", key="google_reg"):
+        if st.button("🔴 Sign Up with Google", key="google_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
             st.session_state.play_sound = True
             st.rerun()
             
-        if st.button("🔵 Sign Up with Telegram", key="tele_reg"):
+        if st.button("🔵 Sign Up with Telegram", key="tele_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
             st.session_state.play_sound = True
@@ -137,7 +112,7 @@ def login_page():
 
     with tab3:
         st.subheader("በእንግድነት ይግቡ")
-        if st.button("Enter as Guest", key="btn_guest"):
+        if st.button("Enter as Guest", key="real_guest_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
             st.session_state.play_sound = True
@@ -158,7 +133,7 @@ def chat_page():
     with col1:
         st.title(f"Abel AI ({st.session_state.user_type})")
     with col2:
-        if st.button("Exit", key="btn_exit"):
+        if st.button("Exit", key="real_exit_btn"):
             st.session_state.logged_in = False
             st.session_state.messages = [] 
             st.session_state.message_count = 0
@@ -186,4 +161,17 @@ def chat_page():
             st.session_state.message_count += 1
             with st.chat_message("user"):
                 st.markdown(prompt)
-            st.session_state.messages.append({"role": "user",
+            st.session_state.messages.append({"role": "user", "content": prompt})
+
+            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ! (ጥያቄ ቁጥር {st.session_state.message_count})"
+            with st.chat_message("assistant"):
+                st.markdown(ai_reply)
+            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Logic to switch pages
+if not st.session_state.logged_in:
+    login_page()
+else:
+    chat_page()
