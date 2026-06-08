@@ -13,7 +13,7 @@ st.markdown("""
     }
 
     /* የመስታወት መልክ ለካርዶች እና ለTabs */
-    div[data-testid="stChatMessage"], .stTabs, .stExpander {
+    div[data-testid="stChatMessage"], .stTabs {
         border-radius: 15px !important;
         backdrop-filter: blur(10px) !important;
         background: rgba(255, 255, 255, 0.2) !important;
@@ -21,15 +21,13 @@ st.markdown("""
     }
 
     /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Glass) መቀየር */
-    div[data-testid="stChatInput"] {
+    .chat-container {
         border-radius: 25px !important;
         backdrop-filter: blur(15px) !important;
         background: rgba(255, 255, 255, 0.25) !important;
         border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    }
-    
-    div[data-testid="stChatInput"] textarea {
-        color: white !important;
+        padding: 10px;
+        margin-top: 20px;
     }
     
     /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
@@ -110,37 +108,53 @@ def chat_page():
     remains_photo = PHOTO_LIMIT - st.session_state.photo_count
     st.sidebar.write(f"📷 የቀረዎት የፎቶ መጠን፦ {remains_photo} / {PHOTO_LIMIT}")
 
-    # 📷 የፎቶ መላኪያ ሳጥን
-    with st.expander("📷 ፎቶ ለመላክ እዚህ ይጫኑ"):
-        if st.session_state.photo_count >= 3:
-            st.error("⚠️ የፎቶ መላኪያ የ 3 ጊዜ ገደብዎ አልቋል!")
-        else:
-            uploaded_file = st.file_uploader("📷 Upload Image (ፎቶ ይምረጡ)", type=["png", "jpg", "jpeg"], key="img_up")
-            if uploaded_file is not None:
-                if st.button("Send Photo 🚀", key="send_img_btn"):
-                    st.session_state.photo_count += 1
-                    st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
-                    st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን አይቶታል። በጣም ያምራል! 👍"})
-                    st.rerun()
-
-    st.write("---")
-
     # Display History
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Chat Bar (Text Input)
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
+    st.write("---")
+
+    # 🌟 NEW CHAT BAR (ፎቶ ማያያዣ ቁልፍ እና የጽሑፍ ሳጥን በአንድ ላይ)
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+    
+    # 3 ቦታዎችን ጎን ለጎን መፍጠር (ለፎቶ ቁልፍ፣ ለጽሑፍ፣ እና ለመላኪያ ቁልፍ)
+    col_photo, col_text, col_send = st.columns([2, 5, 1])
+    
+    with col_photo:
+        if st.session_state.photo_count >= 3:
+            st.caption("📷 ❌ (ገደብ አልቋል)")
+            uploaded_file = None
+        else:
+            # የፎቶ አይኮን ቁልፍ (File Uploader በትንሹ)
+            uploaded_file = st.file_uploader("📷 Icon", type=["png", "jpg", "jpeg"], label_visibility="collapsed", key="chat_photo")
+
+    with col_text:
+        # የጽሑፍ መጻፊያ ሳጥን
+        user_message = st.text_input("እዚህ ይጻፉ... 💬", label_visibility="collapsed", key="chat_msg")
+
+    with col_send:
+        # የመላኪያ ቁልፍ (Send Button)
+        send_clicked = st.button("🚀", key="send_all_btn")
         
-        ai_reply = "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"
-        with st.chat_message("assistant"):
-            st.markdown(ai_reply)
-        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # 🚀 ቁልፉ ሲጫን የሚሠራው ሥራ
+    if send_clicked:
+        if user_message or uploaded_file:
+            # 1. ፎቶ ብቻ ወይም ፎቶ ከጽሑፍ ጋር ከተላከ
+            if uploaded_file is not None:
+                st.session_state.photo_count += 1
+                display_content = f"📷 [ፎቶ ተያይዟል]\n\n✍️ **መልዕክት:** {user_message}" if user_message else "📷 [ፎቶ ተልኳል]"
+                st.session_state.messages.append({"role": "user", "content": display_content})
+                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶዎን እና መልዕክትዎን ተቀብሏል። 👍"})
+            
+            # 2. ጽሑፍ ብቻ ከተላከ
+            elif user_message:
+                st.session_state.messages.append({"role": "user", "content": user_message})
+                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"})
+                
+            st.rerun()
 
 if not st.session_state.logged_in:
     login_page()
