@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Advanced CSS (Ethiopia Flag + Premium Glass Chat Bar)
+# 2. Advanced CSS (Ethiopia Flag Theme + Premium Glass UI)
 st.markdown("""
     <style>
     /* የኢትዮጵያ ባንዲራ ጀርባ */
@@ -35,7 +35,7 @@ st.markdown("""
     /* ጽሑፎች በደንብ እንዲታዩ ማድረጊያ */
     h1, h2, h3, p, label {
         color: white !important;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
     
     /* ቪዲዮው መሃል ላይ እንዲሆን ማድረጊያ */
@@ -43,11 +43,14 @@ st.markdown("""
         display: flex;
         justify-content: center;
         margin-bottom: 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State (ማስታወሻዎች)
+# 3. Session State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -61,15 +64,15 @@ if "message_count" not in st.session_state:
 def login_page():
     st.title("Abel AI 🌟 🇪🇹")
     
-    # 🎬 የ AI ዳንስ ቪዲዮ በHTML (ብሮውዘሩ ሳይከለክለው በቀጥታ Autoplay እንዲሆን ያደርገዋል)
-    video_html = """
+    # 🇪🇹 የሚውለበለብ የኢትዮጵያ ባንዲራ ቪዲዮ (Cinematic Waving Ethiopia Flag)
+    flag_video_html = """
     <div class="video-container">
-        <iframe src="https://player.vimeo.com/video/1004381363?autoplay=1&loop=1&muted=1&background=1" 
-                width="100%" height="250" frameborder="0" allow="autoplay; fullscreen" allowfullscreen>
+        <iframe src="https://www.youtube.com/embed/S2lH8H6963w?autoplay=1&loop=1&playlist=S2lH8H6963w&muted=1&controls=0&showinfo=0&rel=0&modestbranding=1" 
+                width="100%" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
         </iframe>
     </div>
     """
-    st.markdown(video_html, unsafe_allow_html=True)
+    st.markdown(flag_video_html, unsafe_allow_html=True)
     
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
@@ -88,87 +91,4 @@ def login_page():
         st.write("--- ወይም በዚህ ይግቡ ---")
         if st.button("🌐 Continue with Google", key="google_login_unique"):
             st.session_state.logged_in = True
-            st.session_state.user_type = "Google User"
-            st.rerun()
-            
-        if st.button("💬 Continue with Telegram", key="tele_login_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Telegram User"
-            st.rerun()
-
-    with tab2:
-        st.subheader("አዲስ አካውንት ይፍጠሩ")
-        new_user = st.text_input("New Username", key="reg_user")
-        new_pwd = st.text_input("New Password", type="password", key="reg_pwd")
-        if st.button("Sign Up & Start", key="real_signup_btn"):
-            if new_user and new_pwd:
-                st.session_state.logged_in = True
-                st.session_state.user_type = "Member"
-                st.rerun()
-        
-        st.write("--- ወይም በዚህ ይመዝገቡ ---")
-        if st.button("🌐 Sign Up with Google", key="google_reg_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Google User"
-            st.rerun()
-            
-        if st.button("💬 Sign Up with Telegram", key="tele_reg_unique"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Telegram User"
-            st.rerun()
-
-    with tab3:
-        st.subheader("በእንግድነት ይግቡ")
-        if st.button("Enter as Guest", key="real_guest_btn"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "Guest"
-            st.rerun()
-
-# --- MAIN CHAT PAGE ---
-def chat_page():
-    # Header
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.title(f"Abel AI ({st.session_state.user_type})")
-    with col2:
-        if st.button("Exit", key="real_exit_btn"):
-            st.session_state.logged_in = False
-            st.session_state.messages = [] 
-            st.session_state.message_count = 0
-            st.rerun()
-
-    # Sidebar
-    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
-    if st.session_state.user_type == "Guest":
-        GUEST_LIMIT = 5
-        remains = GUEST_LIMIT - st.session_state.message_count
-        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
-    else:
-        st.sidebar.write("♾️ የእርስዎ የጥያቄ መጠን፦ ገደብ የለውም! (No Limit)")
-
-    # Display History
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # Chat Bar (Glass Mode)
-    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
-        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
-            st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
-        else:
-            st.session_state.message_count += 1
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            st.session_state.messages.append({"role": "user", "content": prompt})
-
-            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ! (ጥያቄ ቁጥር {st.session_state.message_count})"
-            with st.chat_message("assistant"):
-                st.markdown(ai_reply)
-            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-            st.rerun()
-
-# Logic to switch pages
-if not st.session_state.logged_in:
-    login_page()
-else:
-    chat_page()
+            st.session_state.user_type =
