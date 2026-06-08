@@ -33,7 +33,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* 🌟 የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Premium Glass) መቀየር */
+    /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Premium Glass) መቀየር */
     div[data-testid="stChatInput"] {
         border-radius: 30px !important;
         backdrop-filter: blur(25px) !important;
@@ -65,14 +65,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
-if "play_sound" not in st.session_state:
-    st.session_state.play_sound = False
-
-# --- 🌟 WELCOME SOUND (HTML AUTOPLAY) ---
-if st.session_state.play_sound:
-    tts_url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=Welcome+to+Abel+AI"
-    st.markdown(f'<iframe src="{tts_url}" allow="autoplay" style="display:none;"></iframe>', unsafe_allow_html=True)
-    st.session_state.play_sound = False
 
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
@@ -90,20 +82,17 @@ def login_page():
             if user and pwd:
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
-                st.session_state.play_sound = True
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይግቡ ---")
         if st.button("🌐 Continue with Google", key="google_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
-            st.session_state.play_sound = True
             st.rerun()
             
         if st.button("💬 Continue with Telegram", key="tele_login_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
-            st.session_state.play_sound = True
             st.rerun()
 
     with tab2:
@@ -114,20 +103,17 @@ def login_page():
             if new_user and new_pwd:
                 st.session_state.logged_in = True
                 st.session_state.user_type = "Member"
-                st.session_state.play_sound = True
                 st.rerun()
         
         st.write("--- ወይም በዚህ ይመዝገቡ ---")
         if st.button("🌐 Sign Up with Google", key="google_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
-            st.session_state.play_sound = True
             st.rerun()
             
         if st.button("💬 Sign Up with Telegram", key="tele_reg_unique"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
-            st.session_state.play_sound = True
             st.rerun()
 
     with tab3:
@@ -135,7 +121,6 @@ def login_page():
         if st.button("Enter as Guest", key="real_guest_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
-            st.session_state.play_sound = True
             st.rerun()
             
     st.markdown('</div>', unsafe_allow_html=True)
@@ -156,3 +141,37 @@ def chat_page():
             st.rerun()
 
     # Sidebar
+    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
+    if st.session_state.user_type == "Guest":
+        GUEST_LIMIT = 5
+        remains = GUEST_LIMIT - st.session_state.message_count
+        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
+    else:
+        st.sidebar.write("♾️ የእርስዎ የጥያቄ መጠን፦ ገደብ የለውም! (No Limit)")
+
+    # Display History
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Chat Bar (Glass Mode)
+    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
+            st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
+        else:
+            st.session_state.message_count += 1
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            st.session_state.messages.append({"role": "user", "content": prompt})
+
+            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ! (ጥያቄ ቁጥር {st.session_state.message_count})"
+            with st.chat_message("assistant"):
+                st.markdown(ai_reply)
+            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Logic to switch pages
+if not st.session_state.logged_in:
+    login_page()
+else
