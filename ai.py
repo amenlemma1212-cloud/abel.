@@ -96,6 +96,6 @@ def chat_page():
     with col2:
         if st.button("Exit", key="real_exit_btn"):
             st.session_state.logged_in = False
-            st.session_state.messages = [] 
+            st.session_state.messages = []  
             st.session_state.photo_count = 0
             st.session_state.show_uploader
