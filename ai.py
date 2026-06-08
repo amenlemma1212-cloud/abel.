@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Page Configuration
 st.set_page_config(page_title="Abel AI", page_icon="🌟", layout="centered")
 
-# 2. Premium Custom CSS (Clean UI Like Gemini/ChatGPT)
+# 2. Advanced CSS (Ethiopia Flag Theme + Premium Glass UI)
 st.markdown("""
     <style>
     /* የኢትዮጵያ ባንዲራ ጀርባ */
@@ -19,6 +19,18 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.2) !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
     }
+
+    /* የቻት ባሩን ወደ ንጹሕ ብሩህ መስታወት (Glass) መቀየር */
+    div[data-testid="stChatInput"] {
+        border-radius: 25px !important;
+        backdrop-filter: blur(15px) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    div[data-testid="stChatInput"] textarea {
+        color: white !important;
+    }
     
     /* ጽሑፎች በባንዲራው ላይ በደንብ እንዲታዩ ማድረጊያ */
     h1, h2, h3, p, label, span {
@@ -31,40 +43,22 @@ st.markdown("""
         text-align: center;
         margin-bottom: 10px;
     }
-
-    /* 🌟 የቻት ባሩን ልክ እንደ እኔ ውብ ማድረጊያ (Premium Chat Bar Box) */
-    .custom-chat-box {
-        background: rgba(255, 255, 255, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 30px;
-        padding: 5px 15px;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* የስትሪምሊት ነባር ማስተካከያዎችን ማጥፊያ */
-    .stTextInput>div>div>input {
-        background: transparent !important;
-        color: white !important;
-        border: none !important;
-    }
-    .stFileUploader>div>button {
-        background: transparent !important;
-        color: white !important;
-        border: none !important;
-    }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State
+# 3. Session State (ማስታወሻዎች)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
     st.session_state.user_type = None 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+# 📷 የፎቶ መቁጠሪያ (Limit: 3)
 if "photo_count" not in st.session_state:
     st.session_state.photo_count = 0
+# 🌟 የፎቶ ማያያዣ መክፈቻ ቁልፍ ሁኔታ
+if "show_uploader" not in st.session_state:
+    st.session_state.show_uploader = False
 
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
@@ -111,6 +105,7 @@ def chat_page():
             st.session_state.logged_in = False
             st.session_state.messages = [] 
             st.session_state.photo_count = 0
+            st.session_state.show_uploader = False
             st.rerun()
 
     # Sidebar (የፎቶ መጠን ማሳያ)
@@ -126,49 +121,36 @@ def chat_page():
 
     st.write("---")
 
-    # 🌟 PREMIUM CHAT BAR CONTAINER (ልክ እንደ እኔ ዲዛይን የተስተካከለ)
-    st.markdown('<div class="custom-chat-box">', unsafe_allow_html=True)
-    
-    # የቻት ባሩን ክፍሎች በጣም ጥብቅና ውብ በሆነ አሰላለፍ ማስቀመጥ
-    c_photo, c_input, c_send = st.columns([1, 6, 1])
-    
-    with c_photo:
+    # 🌟 1. የፎቶ ምልክት ቁልፍ (ስትጫነው ብቻ የፎቶ መላኪያውን ይከፍታል)
+    if st.button("📷 Add Photo (ፎቶ አያይዝ)", key="toggle_upload_btn"):
+        st.session_state.show_uploader = not st.session_state.show_uploader
+        st.rerun()
+
+    # 🌟 2. ቁልፉ ሲጫን ብቻ የሚታይ የፎቶ መምረጫ ሳጥን
+    if st.session_state.show_uploader:
         if st.session_state.photo_count >= 3:
-            st.markdown("<h5 style='text-align:center;'>❌</h5>", unsafe_allow_html=True)
-            uploaded_file = None
+            st.error("⚠️ የፎቶ መላኪያ የ 3 ጊዜ ገደብዎ አልቋል!")
         else:
-            # በጣም ትንሽና ውብ የፎቶ ማያያዣ አይኮን
-            uploaded_file = st.file_uploader("📷", type=["png", "jpg", "jpeg"], label_visibility="collapsed", key="bar_photo")
-
-    with c_input:
-        # የጽሑፍ መጻፊያ ሳጥን
-        user_message = st.text_input("መልዕክትዎን እዚህ ይጻፉ...", label_visibility="collapsed", key="bar_msg")
-
-    with c_send:
-        # የመላኪያ ቁልፍ
-        send_pressed = st.button("🚀", key="bar_send_btn")
-        
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # 🚀 መላኪያ ቁልፍ ሲጫን
-    if send_pressed:
-        if user_message or uploaded_file:
-            # ፎቶ እና ጽሑፍ አብረው ከተላኩ
+            uploaded_file = st.file_uploader("ፎቶዎን ይምረጡ", type=["png", "jpg", "jpeg"], key="hidden_img_up")
             if uploaded_file is not None:
-                st.session_state.photo_count += 1
-                if user_message:
-                    final_text = f"📷 **[ፎቶ ተያይዟል]**\n\n✍️ {user_message}"
-                else:
-                    final_text = "📷 **[ፎቶ ተልኳል]**"
-                st.session_state.messages.append({"role": "user", "content": final_text})
-                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን እና መልዕክትዎን ተቀብሏል። 👍"})
-            
-            # ጽሑፍ ብቻ ከተላከ
-            elif user_message:
-                st.session_state.messages.append({"role": "user", "content": user_message})
-                st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"})
-                
-            st.rerun()
+                if st.button("Send Selected Photo 🚀", key="submit_hidden_img"):
+                    st.session_state.photo_count += 1
+                    st.session_state.messages.append({"role": "user", "content": "📷 [ፎቶ ተልኳል]"})
+                    st.session_state.messages.append({"role": "assistant", "content": "አቤል AI ፎቶውን አይቶታል። በጣም ያምራል! 👍"})
+                    st.session_state.show_uploader = False # ከተላከ በኋላ ሳጥኑን መልሶ መዝጋት
+                    st.rerun()
+
+    # 🌟 3. ኦሪጅናል ውቡ የስትሪምሊት ቻት ባር (Original Chat Input)
+    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        ai_reply = "አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"
+        with st.chat_message("assistant"):
+            st.markdown(ai_reply)
+        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+        st.rerun()
 
 if not st.session_state.logged_in:
     login_page()
