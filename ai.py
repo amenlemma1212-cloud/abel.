@@ -38,17 +38,11 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
     }
 
-    /* የባንዲራ ፎቶ ማማጠኛ ስታይል */
-    .flag-box {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-    .flag-box img {
-        width: 100%;
-        max-width: 450px;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    /* የኢሞጂ ማሳያ ስታይል */
+    .emoji-style {
+        font-size: 100px;
+        text-align: center;
+        margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -65,16 +59,8 @@ if "message_count" not in st.session_state:
 
 # --- SIGN IN / SIGN UP PAGE ---
 def login_page():
-    st.title("Abel AI 🌟 🇪🇹")
-    
-    # 🇪🇹 የኢትዮጵያ ባንዲራ ፎቶ በHTML (ይህ ስልት በጭራሽ ኤረር አይሰጥም)
-    flag_html = """
-    <div class="flag-box">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Flag_of_Ethiopia.svg/1200px-Flag_of_Ethiopia.svg.png" alt="Ethiopia Flag">
-    </div>
-    """
-    st.markdown(flag_html, unsafe_allow_html=True)
-    
+    st.markdown('<div class="emoji-style">🇪🇹</div>', unsafe_allow_html=True)
+    st.title("Abel AI 🌟")
     st.write("እንኳን ደህና መጡ! ለመቀጠል አማራጭ ይምረጡ።")
     
     tab1, tab2, tab3 = st.tabs(["Sign In", "Sign Up", "Guest Mode 👤"])
@@ -125,4 +111,48 @@ def login_page():
         st.subheader("በእንግድነት ይግቡ")
         if st.button("Enter as Guest", key="real_guest_btn"):
             st.session_state.logged_in = True
-            
+            st.session_state.user_type = "Guest"
+            st.rerun()
+
+# --- MAIN CHAT PAGE ---
+def chat_page():
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.title(f"Abel AI ({st.session_state.user_type})")
+    with col2:
+        if st.button("Exit", key="real_exit_btn"):
+            st.session_state.logged_in = False
+            st.session_state.messages = [] 
+            st.session_state.message_count = 0
+            st.rerun()
+
+    st.sidebar.markdown(f"### 📊 ሁኔታ: {st.session_state.user_type}")
+    if st.session_state.user_type == "Guest":
+        GUEST_LIMIT = 5
+        remains = GUEST_LIMIT - st.session_state.message_count
+        st.sidebar.write(f"📅 የቀረዎት ጥያቄ፦ {remains} / {GUEST_LIMIT}")
+    else:
+        st.sidebar.write("♾️ ጥያቄ፦ ገደብ የለውም!")
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("እዚህ ይጻፉ... 💬"):
+        if st.session_state.user_type == "Guest" and st.session_state.message_count >= 5:
+            st.error("⚠️ የእንግዳ Mode ገደብዎ አልቋል!")
+        else:
+            st.session_state.message_count += 1
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            ai_reply = f"አቤል AI ነኝ፣ ጥያቄዎን ተቀብያለሁ!"
+            with st.chat_message("assistant"):
+                st.markdown(ai_reply)
+            st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+            st.rerun()
+
+if not st.session_state.logged_in:
+    login_page()
+else:
+    chat_page()
