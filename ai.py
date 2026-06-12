@@ -48,22 +48,26 @@ def login_page():
         if st.button("Start Chatting 🚀", key="login_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Member"
+            st.rerun()
 
     with tab2:
         st.markdown('<div class="btn-google">🛑 Google Account</div>', unsafe_allow_html=True)
         if st.button("Sign in with Google", key="google_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
+            st.rerun()
         st.write("---")
         st.markdown('<div class="btn-telegram">✈️ Telegram Account</div>', unsafe_allow_html=True)
         if st.button("Sign in with Telegram", key="tg_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
+            st.rerun()
 
     with tab3:
         if st.button("Enter as Guest", key="guest_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
+            st.rerun()
 
 # --- CHAT PAGE ---
 def chat_page():
@@ -72,15 +76,17 @@ def chat_page():
     if st.button("Logout 🚪", key="logout_submit_btn"):
         st.session_state.logged_in = False
         st.session_state.messages = []
+        st.rerun()
 
     # ቻቱን ማሳያ
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር (የሰርቨር ኤረር የሚያመጣው ነገር በሙሉ ተወግዷል)
+    # 💬 የቻት ባር
     if prompt := st.chat_input("እዚህ ይጻፉ..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
+        st.rerun()
 
 # ገጹን መቆጣጠሪያ
 if not st.session_state.logged_in:
