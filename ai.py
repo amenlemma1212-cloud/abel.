@@ -29,7 +29,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Session State
+# 3. Session State (የአፑ ማህደረ ትውስታ)
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_type" not in st.session_state:
@@ -45,23 +45,23 @@ def login_page():
     with tab1:
         st.text_input("Username", key="u_name")
         st.text_input("Password", type="password", key="p_word")
-        if st.button("Start Chatting 🚀"):
+        if st.button("Start Chatting 🚀", key="login_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Member"
 
     with tab2:
         st.markdown('<div class="btn-google">🛑 Google Account</div>', unsafe_allow_html=True)
-        if st.button("Sign in with Google"):
+        if st.button("Sign in with Google", key="google_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Google User"
         st.write("---")
         st.markdown('<div class="btn-telegram">✈️ Telegram Account</div>', unsafe_allow_html=True)
-        if st.button("Sign in with Telegram"):
+        if st.button("Sign in with Telegram", key="tg_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Telegram User"
 
     with tab3:
-        if st.button("Enter as Guest"):
+        if st.button("Enter as Guest", key="guest_submit_btn"):
             st.session_state.logged_in = True
             st.session_state.user_type = "Guest"
 
@@ -69,7 +69,7 @@ def login_page():
 def chat_page():
     st.title(f"Abel AI - {st.session_state.user_type}")
     
-    if st.button("Logout 🚪"):
+    if st.button("Logout 🚪", key="logout_submit_btn"):
         st.session_state.logged_in = False
         st.session_state.messages = []
 
@@ -78,11 +78,9 @@ def chat_page():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # 💬 የቻት ባር (የ AI መልስ ጽሑፍ ሙሉ በሙሉ ተሰርዟል!)
+    # 💬 የቻት ባር (የሰርቨር ኤረር የሚያመጣው ነገር በሙሉ ተወግዷል)
     if prompt := st.chat_input("እዚህ ይጻፉ..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
 
 # ገጹን መቆጣጠሪያ
 if not st.session_state.logged_in:
