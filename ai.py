@@ -92,4 +92,4 @@ def chat_page():
 if not st.session_state.logged_in:
     login_page()
 else:
-    chat_page()
+    chat_page() 
